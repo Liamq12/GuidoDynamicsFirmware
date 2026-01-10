@@ -88,9 +88,9 @@ void udpClient_connect(void)
 static void udpClient_send(void)
 {
   struct pbuf *txBuf;
-  char data[100];
+  char data[300];
 
-  int len = sprintf(data, "sending UDP client message %d", counter);
+  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":42},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":420},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":4200}]}");
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
