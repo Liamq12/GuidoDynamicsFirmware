@@ -22,8 +22,15 @@
 #ifndef INC_UDPCLIENTRAW_H_
 #define INC_UDPCLIENTRAW_H_
 
+struct dataPacket {
+    double force;
+    double RPM;
+    double temp;
+    double humidity;
+    double pressure;
+};
 
-
+void udpClient_send(void);
 void udpClient_connect(void);
 
 

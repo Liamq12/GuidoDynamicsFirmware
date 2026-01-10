@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "udpClientRAW.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +44,9 @@
 TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN PV */
-
+int pollTempPresHumi = 0; // Flag to measure temperature, pressure, and humidity
+int pollForce = 0; // Flag to measure load cell force
+// There is not speed flag (interrupt driven)
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,6 +60,8 @@ static void MX_TIM1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 extern struct netif gnetif;
+extern struct dataPacket dataPacketNow;
+extern struct dataPacket dataPacketPrev;
 /* USER CODE END 0 */
 
 /**
@@ -68,7 +72,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+	dataPacketNow.force = (double) 5.2;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

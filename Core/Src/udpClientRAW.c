@@ -1,23 +1,4 @@
-/*
-  ***************************************************************************************************************
-  ***************************************************************************************************************
-  ***************************************************************************************************************
-
-  File:		  udpClientRAW.c
-  Author:     ControllersTech.com
-  Updated:    Jul 23, 2021
-
-  ***************************************************************************************************************
-  Copyright (C) 2017 ControllersTech.com
-
-  This is a free software under the GNU license, you can redistribute it and/or modify it under the terms
-  of the GNU General Public License version 3 as published by the Free Software Foundation.
-  This software library is shared with public for educational purposes, without WARRANTY and Author is not liable for any damages caused directly
-  or indirectly by this software, read more about this on the GNU General Public License.
-
-  ***************************************************************************************************************
-*/
-
+// Software originally by controllerstech.com, refactored and modified for DMA by Liam Homburger. GNU
 
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
@@ -32,7 +13,18 @@
 
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
-static void udpClient_send(void);
+//static void udpClient_send(void);
+
+//struct dataPacket {
+//    double force;
+//    double RPM;
+//    double temp;
+//    double humidity;
+//    double pressure;
+//};
+
+struct dataPacket dataPacketNow; // Current data packet
+struct dataPacket dataPacketPrev; // Previous data, used to compare with dataPacketNow to only transmit when we have new data
 
 struct udp_pcb *upcb;
 char buffer[100];
@@ -41,10 +33,10 @@ int counter = 0;
 extern TIM_HandleTypeDef htim1;
 
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	udpClient_send();
-}
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//	udpClient_send();
+//}
 
 
 /* IMPLEMENTATION FOR UDP CLIENT :   source:https://www.geeksforgeeks.org/udp-server-client-implementation-c/
@@ -85,12 +77,12 @@ void udpClient_connect(void)
 	}
 }
 
-static void udpClient_send(void)
+void udpClient_send(void)
 {
   struct pbuf *txBuf;
   char data[300];
 
-  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":42},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":420},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":4200}]}");
+  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":42},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":%f},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":4200}]}", dataPacketNow.force);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
