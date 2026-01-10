@@ -82,7 +82,7 @@ void udpClient_send(void)
   struct pbuf *txBuf;
   char data[400];
 
-  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":42},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":%f},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":%s}]}", dataPacketNow.force, dataPacketNow.error);
+  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":42},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":%f},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":420}]}", dataPacketNow.force);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);

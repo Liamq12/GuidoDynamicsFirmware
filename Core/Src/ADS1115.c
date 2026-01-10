@@ -22,7 +22,7 @@
 #define ADS1115_CFG_DR_128SPS   0x0080  // 128 samples per second
 #define ADS1115_CFG_COMP_QUE_DIS 0x0003 // Disable comparator
 
-extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c3;
 extern struct dataPacket dataPacketNow;
 
 // Single ended conversion
@@ -58,7 +58,7 @@ int16_t ADS1115_ReadChannel(uint8_t channel){
     configData[2] = config & 0xFF;         // LSB
 
     // HAL transmit function with error reporting
-    status = HAL_I2C_Master_Transmit(&hi2c1, ADS1115_ADDRESS, configData, 3, 100);
+    status = HAL_I2C_Master_Transmit(&hi2c3, ADS1115_ADDRESS, configData, 3, 100);
 //    if (status != HAL_OK) {
 //        snprintf(dataPacketNow.error,
 //                 sizeof(dataPacketNow.error),
@@ -72,10 +72,10 @@ int16_t ADS1115_ReadChannel(uint8_t channel){
 
     // Point to conversion register
     uint8_t regAddr = ADS1115_REG_CONVERSION;
-    HAL_I2C_Master_Transmit(&hi2c1, ADS1115_ADDRESS, &regAddr, 1, HAL_MAX_DELAY);
+    HAL_I2C_Master_Transmit(&hi2c3, ADS1115_ADDRESS, &regAddr, 1, HAL_MAX_DELAY);
 
     // Read conversion result
-    HAL_I2C_Master_Receive(&hi2c1, ADS1115_ADDRESS, conversionData, 2, HAL_MAX_DELAY);
+    HAL_I2C_Master_Receive(&hi2c3, ADS1115_ADDRESS, conversionData, 2, HAL_MAX_DELAY);
 
     // Combine bytes (MSB first)
     int16_t result = (conversionData[0] << 8) | conversionData[1];
@@ -97,13 +97,13 @@ void ADS1115_Diagnostics(void){
 
     uint8_t devicesFound = 0;
     for (uint8_t i = 1; i < 128; i++) {
-        status = HAL_I2C_IsDeviceReady(&hi2c1, i << 1, 1, 10);
+        status = HAL_I2C_IsDeviceReady(&hi2c3, i << 1, 1, 10);
         if (status == HAL_OK) {
         	devicesFound++;
         }
     }
-	snprintf(dataPacketNow.error,
-			 sizeof(dataPacketNow.error),
-			 "I2C Write Error: %d\r\n",
-			 devicesFound);
+//	snprintf(dataPacketNow.error,
+//			 sizeof(dataPacketNow.error),
+//			 "I2C Write Error: %d\r\n",
+//			 devicesFound);
 }
