@@ -79,6 +79,8 @@ void udpClient_connect(void)
 
 void udpClient_send(void)
 {
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, 0);
+
   struct pbuf *txBuf;
   char data[400];
 
@@ -98,7 +100,8 @@ void udpClient_send(void)
     /* free pbuf */
     pbuf_free(txBuf);
   }
-  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
+//  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, 1);
 }
 
 
