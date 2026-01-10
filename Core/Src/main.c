@@ -57,7 +57,7 @@ static void MX_TIM1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern struct netif gnetif;
 /* USER CODE END 0 */
 
 /**
@@ -92,7 +92,9 @@ int main(void)
   MX_TIM1_Init();
   MX_LWIP_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim1);
 
+  udpClient_connect();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,6 +104,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  MX_LWIP_Process();
+	  ethernetif_input(&gnetif);
+	  sys_check_timeouts();
   }
   /* USER CODE END 3 */
 }
