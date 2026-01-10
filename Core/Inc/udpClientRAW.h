@@ -28,6 +28,7 @@ struct dataPacket {
     double temp;
     double humidity;
     double pressure;
+    char error[100];
 };
 
 void udpClient_send(void);
