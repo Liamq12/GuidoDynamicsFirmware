@@ -1,2 +1,3 @@
-../Core/Src/ADS1115.c:29:9:ADS1115_ReadChannel	6
+../Core/Src/ADS1115.c:29:9:ADS1115_ReadChannel	5
 ../Core/Src/ADS1115.c:86:8:ADS1115_ConvertToVoltage	1
+../Core/Src/ADS1115.c:94:6:ADS1115_Diagnostics	3

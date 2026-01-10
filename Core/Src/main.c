@@ -111,10 +111,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  int16_t rawValue = ADS1115_ReadChannel(0);
-	  double voltage = ADS1115_ConvertToVoltage(rawValue);
+//	  int16_t rawValue = ADS1115_ReadChannel(0);
+//	  double voltage = ADS1115_ConvertToVoltage(rawValue);
+//	  dataPacketNow.force = rawValue;
+	  ADS1115_Diagnostics();
+	  HAL_Delay(10);
 
-	  dataPacketNow.force = rawValue;
     /* USER CODE BEGIN 3 */
 
 
