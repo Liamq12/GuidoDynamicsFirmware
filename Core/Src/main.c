@@ -392,8 +392,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     if (GPIO_Pin == HALL_INDUCTANCE)
     {
     	uint32_t now = HAL_GetTick();
-    	if (now - last_ms > 125)   // debounce. Remove this shit once induction sensor is installed
-    	{
+//    	if (now - last_ms > 125)   // debounce. Remove this shit once induction sensor is installed
+//    	{
     		last_ms = now;
 
 			timerNow = TIM8->CNT; // Get timer 8 value on falling edge
@@ -405,7 +405,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			dataPacketNow.RPM = timeDelay*60*PULSE_PER_REV; // Reset to 0 after sending value
 
 			__HAL_TIM_SET_COUNTER(&htim8, 0);
-    	}
+//    	}
     }
 }
 /* USER CODE END 4 */
