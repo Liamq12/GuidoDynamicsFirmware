@@ -29,7 +29,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #define HALL_INDUCTANCE SpeedInduction_Pin
-#define PULSE_PER_REV 4
+#define PULSE_PER_REV 50
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -400,11 +400,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			uint32_t pclk = HAL_RCC_GetPCLK2Freq(); // Gets APB2 Clock (for timer 8)
 			uint32_t tim8_prescaler = TIM8->PSC; // Get timer 8 prescaler
 
-			double timeDelay = 1/(double)((timerNow * (tim8_prescaler+1))/(double)pclk*2);
+			double timeDelay = 1/(double)((timerNow * (tim8_prescaler+1))/(double)pclk); // Calculate period between pulses
 
-			dataPacketNow.RPM = timeDelay*60*PULSE_PER_REV; // Reset to 0 after sending value
+			dataPacketNow.RPM = timeDelay*2; // 1/(timeDelay*PULSE_PER_REV); // Calculate RPM
 
-			__HAL_TIM_SET_COUNTER(&htim8, 0);
+			__HAL_TIM_SET_COUNTER(&htim8, 0); // Reset to 0 after sending value
 //    	}
     }
 }
