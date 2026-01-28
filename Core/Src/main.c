@@ -112,7 +112,7 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
-  HAL_TIM_Base_Start_IT(&htim8);
+  HAL_TIM_IC_Start_IT(&htim8, TIM_CHANNEL_1);
 
   udpClient_connect();
   /* USER CODE END 2 */
@@ -309,12 +309,13 @@ static void MX_TIM8_Init(void)
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_IC_InitTypeDef sConfigIC = {0};
 
   /* USER CODE BEGIN TIM8_Init 1 */
 
   /* USER CODE END TIM8_Init 1 */
   htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 2000-1;
+  htim8.Init.Prescaler = 50-1;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim8.Init.Period = 64000;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -329,9 +330,21 @@ static void MX_TIM8_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_IC_Init(&htim8) != HAL_OK)
+  {
+    Error_Handler();
+  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+  sConfigIC.ICFilter = 0;
+  if (HAL_TIM_IC_ConfigChannel(&htim8, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -370,44 +383,54 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : SpeedInduction_Pin */
-  GPIO_InitStruct.Pin = SpeedInduction_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(SpeedInduction_GPIO_Port, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	static uint32_t last_ms = 0;
-    if (GPIO_Pin == HALL_INDUCTANCE)
-    {
-    	uint32_t now = HAL_GetTick();
-//    	if (now - last_ms > 125)   // debounce. Remove this shit once induction sensor is installed
-//    	{
-    		last_ms = now;
 
-			timerNow = TIM8->CNT; // Get timer 8 value on falling edge
-			uint32_t pclk = HAL_RCC_GetPCLK2Freq(); // Gets APB2 Clock (for timer 8)
-			uint32_t tim8_prescaler = TIM8->PSC; // Get timer 8 prescaler
+//Exti based spedd sensor
+//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+//{
+//	static uint32_t last_ms = 0;
+//    if (GPIO_Pin == HALL_INDUCTANCE)
+//    {
+//    	uint32_t now = HAL_GetTick();
+////    	if (now - last_ms > 125)   // debounce. Remove this shit once induction sensor is installed
+////    	{
+//    		last_ms = now;
+//
+//			timerNow = TIM8->CNT; // Get timer 8 value on falling edge
+//			uint32_t pclk = HAL_RCC_GetPCLK2Freq(); // Gets APB2 Clock (for timer 8)
+//			uint32_t tim8_prescaler = TIM8->PSC; // Get timer 8 prescaler
+//
+//			double timeDelay = 1/(double)((timerNow * (tim8_prescaler+1))/(double)pclk); // Calculate period between pulses
+//
+//			dataPacketNow.RPM = timeDelay*2; // 1/(timeDelay*PULSE_PER_REV); // Calculate RPM
+//
+//			__HAL_TIM_SET_COUNTER(&htim8, 0); // Reset to 0 after sending value
+////    	}
+//    }
+//}
 
-			double timeDelay = 1/(double)((timerNow * (tim8_prescaler+1))/(double)pclk); // Calculate period between pulses
+double captureValue = 0;
+double frequency = 0;
+double rpm = 0;
+// Manually calibrated correction factors, fixing clock jitter effects, crystal instabillity, etc
+double correctiveFactors[] = {0.4, 0.4, 0, -0.8, -2}; // Interval of 100Hz per index, tuned in lab
 
-			dataPacketNow.RPM = timeDelay*2; // 1/(timeDelay*PULSE_PER_REV); // Calculate RPM
-
-			__HAL_TIM_SET_COUNTER(&htim8, 0); // Reset to 0 after sending value
-//    	}
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
+        __HAL_TIM_SET_COUNTER(htim, 0);
+        captureValue = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+        frequency = (HAL_RCC_GetPCLK2Freq()*2) / (captureValue * (TIM8->PSC+1));
+        rpm = (frequency / PULSE_PER_REV) * 60;
+        //correctionFactor = rpm/200;
+        dataPacketNow.RPM = rpm; // - correctionFactor;
     }
 }
+
 /* USER CODE END 4 */
 
 /**

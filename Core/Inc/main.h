@@ -59,9 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_14
 #define LED_GPIO_Port GPIOE
-#define SpeedInduction_Pin GPIO_PIN_6
-#define SpeedInduction_GPIO_Port GPIOC
-#define SpeedInduction_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
