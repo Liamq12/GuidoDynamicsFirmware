@@ -308,6 +308,7 @@ static void MX_TIM8_Init(void)
   /* USER CODE END TIM8_Init 0 */
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_IC_InitTypeDef sConfigIC = {0};
 
@@ -331,6 +332,14 @@ static void MX_TIM8_Init(void)
     Error_Handler();
   }
   if (HAL_TIM_IC_Init(&htim8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_RESET;
+  sSlaveConfig.InputTrigger = TIM_TS_TI1FP1;
+  sSlaveConfig.TriggerPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sSlaveConfig.TriggerFilter = 0;
+  if (HAL_TIM_SlaveConfigSynchro(&htim8, &sSlaveConfig) != HAL_OK)
   {
     Error_Handler();
   }
@@ -421,8 +430,8 @@ double rpm = 0;
 double correctiveFactors[] = {0.4, 0.4, 0, -0.8, -2}; // Interval of 100Hz per index, tuned in lab
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+//	__HAL_TIM_SET_COUNTER(htim, 0);
     if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
-        __HAL_TIM_SET_COUNTER(htim, 0);
         captureValue = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
         frequency = (HAL_RCC_GetPCLK2Freq()*2) / (captureValue * (TIM8->PSC+1));
         rpm = (frequency / PULSE_PER_REV) * 60;
