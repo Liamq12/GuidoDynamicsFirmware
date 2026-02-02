@@ -83,9 +83,9 @@ void udpClient_send(void)
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, 0);
 
   struct pbuf *txBuf;
-  char data[400];
+  char data[800];
 
-  int len = sprintf(data, "{\"name\":\"DAQ1\",\"uptime\":40284,\"id\":1,\"data\":[{\"metric\":\"wheelSpeed\",\"time\":2039,\"unit\":\"RPM\",\"value\":%f},{\"metric\":\"dynoLoad\",\"time\":2039,\"unit\":\"lbf\",\"value\":%f},{\"metric\":\"ambTemp\",\"time\":2039,\"unit\":\"C\",\"value\":67}]}", dataPacketNow.RPM, dataPacketNow.force);
+  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", 67],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", 42],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", 9],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", 0]]}", dataPacketNow.RPM, dataPacketNow.force);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
@@ -117,6 +117,8 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 
 	/* Free receive pbuf */
 	pbuf_free(p);
+
+
 }
 
 
