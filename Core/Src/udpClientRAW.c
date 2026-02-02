@@ -32,6 +32,9 @@ int counter = 0;
 
 extern TIM_HandleTypeDef htim1;
 
+ip_addr_t DestIPaddr;
+ip_addr_t myIPaddr;
+
 
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
@@ -57,13 +60,11 @@ void udpClient_connect(void)
 	upcb = udp_new();
 
 	/* Bind the block to module's IP and port */
-	ip_addr_t myIPaddr;
 	IP_ADDR4(&myIPaddr, 192, 168, 0, 123);
 	udp_bind(upcb, &myIPaddr, 8);
 
 
 	/* configure destination IP address and port */
-	ip_addr_t DestIPaddr;
 	IP_ADDR4(&DestIPaddr, 192, 168, 0, 2);
 	//err= udp_connect(upcb, &DestIPaddr, 7);
 	udp_recv(upcb, udp_receive_callback, NULL);
@@ -95,7 +96,8 @@ void udpClient_send(void)
     pbuf_take(txBuf, data, len);
 
     /* send udp data */
-    udp_send(upcb, txBuf);
+//    udp_send(upcb, txBuf);
+    udp_sendto(upcb, txBuf, &DestIPaddr, 7);
 
     /* free pbuf */
     pbuf_free(txBuf);
@@ -107,16 +109,14 @@ void udpClient_send(void)
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
 {
-//	/* Copy the data from the pbuf */
-//	strncpy (buffer, (char *)p->payload, p->len);
-//
-//	/*increment message count */
-//	counter++;
-//
-//	/* Free receive pbuf */
-//	pbuf_free(p);
+	/* Copy the data from the pbuf */
+	strncpy (buffer, (char *)p->payload, p->len);
 
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+	/*increment message count */
+	counter++;
+
+	/* Free receive pbuf */
+	pbuf_free(p);
 }
 
 
