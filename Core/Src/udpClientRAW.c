@@ -65,16 +65,16 @@ void udpClient_connect(void)
 	/* configure destination IP address and port */
 	ip_addr_t DestIPaddr;
 	IP_ADDR4(&DestIPaddr, 192, 168, 0, 2);
-	err= udp_connect(upcb, &DestIPaddr, 7);
-
-	if (err == ERR_OK)
-	{
-		/* 2. Send message to server */
-		// udpClient_send ();
-
-		/* 3. Set a receive callback for the upcb */
-		udp_recv(upcb, udp_receive_callback, NULL);
-	}
+	//err= udp_connect(upcb, &DestIPaddr, 7);
+	udp_recv(upcb, udp_receive_callback, NULL);
+//	if (err == ERR_OK)
+//	{
+//		/* 2. Send message to server */
+//		// udpClient_send ();
+//
+//		/* 3. Set a receive callback for the upcb */
+//		udp_recv(upcb, udp_receive_callback, NULL);
+//	}
 }
 
 void udpClient_send(void)
@@ -107,14 +107,16 @@ void udpClient_send(void)
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
 {
-	/* Copy the data from the pbuf */
-	strncpy (buffer, (char *)p->payload, p->len);
+//	/* Copy the data from the pbuf */
+//	strncpy (buffer, (char *)p->payload, p->len);
+//
+//	/*increment message count */
+//	counter++;
+//
+//	/* Free receive pbuf */
+//	pbuf_free(p);
 
-	/*increment message count */
-	counter++;
-
-	/* Free receive pbuf */
-	pbuf_free(p);
+	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
 }
 
 
