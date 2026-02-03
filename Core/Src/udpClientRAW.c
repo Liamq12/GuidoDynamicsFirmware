@@ -25,6 +25,8 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 
 struct dataPacket dataPacketNow; // Current data packet
 struct dataPacket dataPacketPrev; // Previous data, used to compare with dataPacketNow to only transmit when we have new data
+extern struct valveData valveData;
+
 
 struct udp_pcb *upcb;
 char buffer[100];
@@ -80,12 +82,12 @@ void udpClient_connect(void)
 
 void udpClient_send(void)
 {
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, 0);
+//  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
 
   struct pbuf *txBuf;
   char data[800];
 
-  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", 67],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", 42],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", 9],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", 0]]}", dataPacketNow.RPM, dataPacketNow.force);
+  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", 67],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", 42],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", 9],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, valveData.targetPosition);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
@@ -103,22 +105,35 @@ void udpClient_send(void)
     pbuf_free(txBuf);
   }
 //  HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_14);
-  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_14, 1);
+//  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 1);
 }
 
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
 {
-	/* Copy the data from the pbuf */
-	strncpy (buffer, (char *)p->payload, p->len);
+    // Make sure buffer is large enough and null-terminated
+    if (p->len >= sizeof(buffer))
+        p->len = sizeof(buffer) - 1;
 
-	/*increment message count */
-	counter++;
+    strncpy(buffer, (char *)p->payload, p->len);
+    buffer[p->len] = '\0'; // null-terminate the string
 
-	/* Free receive pbuf */
-	pbuf_free(p);
+    // Increment message count
+    counter++;
 
+    // Check if the message is "Hello"
+    if (strcmp(buffer, "Hello") == 0) {
+        // Do something when "Hello" is received
+    	valveData.targetPosition += 100;
+    	if(valveData.polarity == 1){
+    		valveData.polarity = 0;
+    	}else{
+    		valveData.polarity = 1;
+    	}
+    }
 
+    // Free the receive pbuf
+    pbuf_free(p);
 }
 
 

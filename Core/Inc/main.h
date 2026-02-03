@@ -57,10 +57,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DIO3_Pin GPIO_PIN_0
+#define DIO3_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_14
 #define LED_GPIO_Port GPIOE
+#define DIO2_Pin GPIO_PIN_12
+#define DIO2_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
+struct valveData {
+    int pulsesPerRev;
+    int upperBound;
+    int isZero;
+    int position;
+    int targetPosition;
+    int polarity;
+    int intFlag;
+    int pulseDiff;
+};
 
 /* USER CODE END Private defines */
 

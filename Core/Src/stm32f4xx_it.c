@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "udpClientRAW.h"
+#include "valveControl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,6 +44,10 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 int transmitReady = 0; // Flag for when UDP transmission packet is ready
+
+extern struct valveData valveData;
+
+extern int pulsesToGo;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -52,12 +57,14 @@ int transmitReady = 0; // Flag for when UDP transmission packet is ready
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern struct valveData valveData;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim8;
 /* USER CODE BEGIN EV */
 
@@ -213,6 +220,37 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
   udpClient_send();
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+ valveData.intFlag = 1;
+  /* USER CODE END TIM3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM4 global interrupt.
+  */
+void TIM4_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM4_IRQn 0 */
+
+  /* USER CODE END TIM4_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim4);
+  /* USER CODE BEGIN TIM4_IRQn 1 */
+  if(pulsesToGo != 0){
+	  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+	  pulsesToGo--;
+  }
+  /* USER CODE END TIM4_IRQn 1 */
 }
 
 /**
