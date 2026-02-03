@@ -71,9 +71,11 @@ struct valveData {
     int isZero;
     int position;
     int targetPosition;
+    int targetPositionSteps;
     int polarity;
     int intFlag;
     int pulseDiff;
+    double positionInSteps;
 };
 
 /* USER CODE END Private defines */

@@ -27,12 +27,20 @@ void valveControlLoop(void){
 		valveData.pulseDiff = valveData.targetPosition - valveData.position;
 		valveData.position = valveData.targetPosition;
 		int direction = 1;
-		if(valveData.polarity >= 1){
+		//HAL_NVIC_EnableIRQ(TIM4_IRQn);
+		if(valveData.polarity >= 1 && valveData.pulseDiff >= 1){
 			direction = 1;
-		}else{
+			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+		}else if(valveData.polarity >= 1 && valveData.pulseDiff <= 0){
 			direction = 0;
+			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+		}else if(valveData.polarity <= 0 && valveData.pulseDiff <= 0){
+			direction = 1;
+			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+		}else if(valveData.polarity <= 0 && valveData.pulseDiff >= 1){
+			direction = 0;
+			generatePulses(abs(valveData.pulseDiff), direction);
 		}
-		generatePulses(valveData.pulseDiff, direction);
 	}
 	valveData.intFlag = 0;
 }

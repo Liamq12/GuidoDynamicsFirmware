@@ -9,6 +9,6 @@
 ../Core/Src/stm32f4xx_it.c:193:6:SysTick_Handler	1
 ../Core/Src/stm32f4xx_it.c:214:6:TIM1_UP_TIM10_IRQHandler	1
 ../Core/Src/stm32f4xx_it.c:228:6:TIM3_IRQHandler	1
-../Core/Src/stm32f4xx_it.c:242:6:TIM4_IRQHandler	2
-../Core/Src/stm32f4xx_it.c:259:6:TIM8_CC_IRQHandler	1
-../Core/Src/stm32f4xx_it.c:273:6:ETH_IRQHandler	1
+../Core/Src/stm32f4xx_it.c:242:6:TIM4_IRQHandler	3
+../Core/Src/stm32f4xx_it.c:268:6:TIM8_CC_IRQHandler	1
+../Core/Src/stm32f4xx_it.c:282:6:ETH_IRQHandler	1
