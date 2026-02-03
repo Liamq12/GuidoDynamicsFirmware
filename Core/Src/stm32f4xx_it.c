@@ -62,6 +62,7 @@ extern struct valveData valveData;
 
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
+extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
@@ -274,6 +275,20 @@ void TIM8_CC_IRQHandler(void)
   /* USER CODE BEGIN TIM8_CC_IRQn 1 */
 
   /* USER CODE END TIM8_CC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA2 stream0 global interrupt.
+  */
+void DMA2_Stream0_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream0_IRQn 1 */
 }
 
 /**

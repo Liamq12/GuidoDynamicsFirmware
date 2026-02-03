@@ -85,7 +85,7 @@ void udpClient_send(void)
   struct pbuf *txBuf;
   char data[800];
 
-  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", 67],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", 42],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
+  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", %f],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", 42],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, dataPacketNow.temp, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
