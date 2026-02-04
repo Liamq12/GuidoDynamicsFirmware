@@ -137,7 +137,7 @@ int main(void)
   udpClient_connect();
 
   // Default values for valve
-  valveData.pulsesPerRev = 1000; // This should be set to the lowest possible selectable
+  valveData.pulsesPerRev = 6400; // This should be set to the lowest possible selectable
   valveData.upperBound = valveData.pulsesPerRev/2; // Rough guess, test and fix
   valveData.polarity = 1; // 1 for normal, 0 for inversed.
   valveData.position = 0; // Start at zero, then run zeroing procedure
@@ -449,7 +449,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 10-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 840-1;
+  htim4.Init.Period = 84-1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)

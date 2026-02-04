@@ -126,7 +126,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     memcpy(CWBuffer, buffer, 5);
     CWBuffer[5] = '\0';
 
-    memcpy(subCWBuffer, &buffer[5], 3);
+    memcpy(subCWBuffer, &buffer[6], 3);
     subCWBuffer[3] = '\0';
 
     char *val = strrchr(buffer, ',');
@@ -134,16 +134,13 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 
     // Check if the message is "Hello"
     if (strcmp(CWBuffer, "VALVE") == 0) {
-        // Do something when "Hello" is received
-    	int stepPosition = (position/100)*valveData.pulsesPerRev;
-    	valveData.targetPosition = stepPosition;
-//    	if(valveData.polarity == 1){
-//    		valveData.polarity = 0;
-//    	}else{
-//    		valveData.polarity = 1;
-//    	}
-    }
+        if(strcmp(subCWBuffer, "POS") == 0){
+			int stepPosition = (position/100)*valveData.pulsesPerRev;
+			valveData.targetPosition = stepPosition;
+        }else if(strcmp(subCWBuffer, "ZER") == 0){
 
+        }
+    }
     // Free the receive pbuf
     pbuf_free(p);
 }

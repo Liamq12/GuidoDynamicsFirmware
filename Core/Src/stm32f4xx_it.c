@@ -248,6 +248,9 @@ void TIM4_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
   if(pulsesToGo != 0){
+	  if((valveData.positionInSteps >= (valveData.pulsesPerRev/2) && ((DIO2_GPIO_Port->ODR & DIO2_Pin) != 0)) || (valveData.positionInSteps <= 0 && ((DIO2_GPIO_Port->ODR & DIO2_Pin) == 0))){
+		  return;
+	  }
 	  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
 	  pulsesToGo--;
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){

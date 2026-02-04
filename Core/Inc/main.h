@@ -67,6 +67,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 struct valveData {
     int pulsesPerRev;
+    double gearReduction;
     int upperBound;
     int isZero;
     int position;
