@@ -77,6 +77,20 @@ struct valveData {
     int intFlag;
     int pulseDiff;
     double positionInSteps;
+    int zeroRoutine;
+};
+
+struct PID_Data {
+    double RPM_Target;
+    int RPM_EN;
+    double TORQUE_Target;
+    int TORQUE_EN;
+};
+
+struct AlarmThresholds {
+	double RPM_Alarm;
+	double Torque_Alarm;
+	double Power_Alarm;
 };
 
 /* USER CODE END Private defines */

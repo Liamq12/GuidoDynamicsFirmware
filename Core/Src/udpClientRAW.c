@@ -25,6 +25,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 struct dataPacket dataPacketNow; // Current data packet
 struct dataPacket dataPacketPrev; // Previous data, used to compare with dataPacketNow to only transmit when we have new data
 extern struct valveData valveData;
+extern struct PID_Data PID_Data;
 
 struct udp_pcb *upcb;
 char buffer[100];
@@ -130,16 +131,32 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     subCWBuffer[3] = '\0';
 
     char *val = strrchr(buffer, ',');
-    double position = atof(val + 1);
+    double num = atof(val + 1);
 
     // Check if the message is "Hello"
     if (strcmp(CWBuffer, "VALVE") == 0) {
         if(strcmp(subCWBuffer, "POS") == 0){
-			int stepPosition = (position/100)*valveData.pulsesPerRev;
+			int stepPosition = (num/100)*valveData.pulsesPerRev;
 			valveData.targetPosition = stepPosition;
         }else if(strcmp(subCWBuffer, "ZER") == 0){
 
+        }else if(strcmp(subCWBuffer, "PPR") == 0){
+        	valveData.pulsesPerRev = num;
+        }else if(strcmp(subCWBuffer, "GRO") == 0){
+        	valveData.gearReduction = num;
         }
+    }else if(strcmp(CWBuffer, "COPID")){
+    	if(strcmp(subCWBuffer, "RPM")){
+    		PID_Data.RPM_Target = num;
+    	}else if(strcmp(subCWBuffer, "TOR")){
+    		PID_Data.TORQUE_Target = num;
+    	}
+    }else if(strcmp(CWBuffer, "ENPID")){
+    	if(strcmp(subCWBuffer, "RPM")){
+    		PID_Data.RPM_EN = num;
+    	}else if(strcmp(subCWBuffer, "TOR")){
+    		PID_Data.TORQUE_EN = num;
+    	}
     }
     // Free the receive pbuf
     pbuf_free(p);

@@ -66,6 +66,7 @@ uint32_t timerPrev = 0;
 uint16_t adc_buf[16];
 
 struct valveData valveData;
+struct PID_Data PID_Data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,6 +142,7 @@ int main(void)
   valveData.upperBound = valveData.pulsesPerRev/2; // Rough guess, test and fix
   valveData.polarity = 1; // 1 for normal, 0 for inversed.
   valveData.position = 0; // Start at zero, then run zeroing procedure
+  valveData.gearReduction = 1;
 
 //  HAL_NVIC_DisableIRQ(TIM4_IRQn);
   /* USER CODE END 2 */
