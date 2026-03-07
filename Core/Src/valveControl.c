@@ -16,11 +16,17 @@
 #include <main.h>
 
 #include "valveControl.h"
+#include "udpClientRAW.h"
+
+#define CLAMP(x, min, max)  ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
 int pulseDiff;
 int pulsesToGo;
+int isZeroing;
 
 extern struct valveData valveData;
+extern struct PID_Data PID_Data;
+extern struct dataPacket dataPacketNow;
 
 void valveControlLoop(void){
 	if(valveData.position != valveData.targetPosition){
@@ -49,4 +55,17 @@ void generatePulses(int pulses, int direction){
 	HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, direction);
 	HAL_GPIO_WritePin(DIO3_GPIO_Port, DIO3_Pin, 0); // start low
 	pulsesToGo = 2*pulses; // Two times the number of pulses, due to toggle logic
+}
+
+//void zeroValve(){
+//	isZeroing = 1;
+//}
+
+void PID_OP_PT(){
+	// PID_Data.RPM_Target = ((PID_Data.RPM_Count/100) * PID_Data.RPM_Ramp_Rate) + PID_Data.RPM_Idle;
+	float error = PID_Data.RPM_Target - dataPacketNow.RPM;
+	PID_Data.accum += error * PID_Data.KI;
+	PID_Data.accum = CLAMP(PID_Data.accum, 0, PID_Data.accumMax);
+	float correction = (error*PID_Data.KP) + (PID_Data.accum);
+	valveData.targetPosition = valveData.position - correction;
 }

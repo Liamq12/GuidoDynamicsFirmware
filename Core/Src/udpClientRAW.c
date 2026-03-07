@@ -145,17 +145,19 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
         }else if(strcmp(subCWBuffer, "GRO") == 0){
         	valveData.gearReduction = num;
         }
-    }else if(strcmp(CWBuffer, "COPID")){
-    	if(strcmp(subCWBuffer, "RPM")){
-    		PID_Data.RPM_Target = num;
-    	}else if(strcmp(subCWBuffer, "TOR")){
-    		PID_Data.TORQUE_Target = num;
+    }else if(strcmp(CWBuffer, "COPID") == 0){
+    	if(strcmp(subCWBuffer, "RPM") == 0){
+    		PID_Data.RPM_Target = (float) num;
     	}
-    }else if(strcmp(CWBuffer, "ENPID")){
-    	if(strcmp(subCWBuffer, "RPM")){
-    		PID_Data.RPM_EN = num;
-    	}else if(strcmp(subCWBuffer, "TOR")){
-    		PID_Data.TORQUE_EN = num;
+    }else if(strcmp(CWBuffer, "FRAMP") == 0){
+    	if(strcmp(subCWBuffer, "RPM") == 0){
+    		PID_Data.RPM_End_Target = (float) num;
+    	}else if(strcmp(subCWBuffer, "RTE") == 0){
+    		PID_Data.RPM_Ramp_Rate = (float) num;
+    	}else if(strcmp(subCWBuffer, "ENA") == 0){
+    		PID_Data.RPM_EN = (int) num;
+    	}else if(strcmp(subCWBuffer, "IMX") == 0){
+    		PID_Data.accumMax = (float) num;
     	}
     }
     // Free the receive pbuf

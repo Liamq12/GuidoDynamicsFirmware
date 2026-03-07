@@ -54,6 +54,7 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim8;
+TIM_HandleTypeDef htim13;
 
 /* USER CODE BEGIN PV */
 int pollTempPresHumi = 0; // Flag to measure temperature, pressure, and humidity
@@ -80,6 +81,7 @@ static void MX_TIM8_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_TIM13_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -129,20 +131,35 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_ADC1_Init();
+  MX_TIM13_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_Base_Start_IT(&htim4);
+  HAL_TIM_Base_Start_IT(&htim13);
   HAL_TIM_IC_Start_IT(&htim8, TIM_CHANNEL_1);
 
   udpClient_connect();
 
   // Default values for valve
   valveData.pulsesPerRev = 6400; // This should be set to the lowest possible selectable
-  valveData.upperBound = valveData.pulsesPerRev/2; // Rough guess, test and fix
-  valveData.polarity = 1; // 1 for normal, 0 for inversed.
+  valveData.upperBound = valveData.pulsesPerRev; // Rough guess, test and fix
+  valveData.polarity = -1; // 1 for normal, -1 for inversed.
   valveData.position = 0; // Start at zero, then run zeroing procedure
+  valveData.targetPosition = 0;
   valveData.gearReduction = 1;
+  valveData.positionInSteps = 0;
+
+  PID_Data.RPM_Target = 800;
+  PID_Data.KP = 0.7f;
+  PID_Data.KI = 0.0f;
+  PID_Data.KD = 0.0f;
+  PID_Data.accum = 0.0f;
+  PID_Data.accumMax = 10.0f;
+
+  PID_Data.RPM_EN = 0;
+
+//  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
 //  HAL_NVIC_DisableIRQ(TIM4_IRQn);
   /* USER CODE END 2 */
@@ -156,6 +173,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  if(valveData.intFlag == 1){
 		  valveControlLoop();
+	  }
+
+	  if(PID_Data.RPM_Flag == 1){
+		  PID_OP_PT();
 	  }
 
       int16_t rawValue = ADS1115_ReadChannel(0);
@@ -404,7 +425,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 100-1;
+  htim3.Init.Prescaler = 50-1;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 65535;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -544,6 +565,37 @@ static void MX_TIM8_Init(void)
 }
 
 /**
+  * @brief TIM13 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM13_Init(void)
+{
+
+  /* USER CODE BEGIN TIM13_Init 0 */
+
+  /* USER CODE END TIM13_Init 0 */
+
+  /* USER CODE BEGIN TIM13_Init 1 */
+
+  /* USER CODE END TIM13_Init 1 */
+  htim13.Instance = TIM13;
+  htim13.Init.Prescaler = 10000-1;
+  htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim13.Init.Period = 84-1;
+  htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim13) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM13_Init 2 */
+
+  /* USER CODE END TIM13_Init 2 */
+
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -653,6 +705,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
         frequency = (HAL_RCC_GetPCLK2Freq()*2) / (captureValue * (TIM8->PSC+1));
         rpm = (frequency / PULSE_PER_REV) * 60;
         //correctionFactor = rpm/200;
+        if(rpm >= 4000 || (rpm >= 150 && rpm/dataPacketNow.RPM >= 1.3)){
+        	rpm = dataPacketPrev.RPM;
+        }
+        dataPacketPrev.RPM = dataPacketNow.RPM;
         dataPacketNow.RPM = rpm; // - correctionFactor;
     }
 }

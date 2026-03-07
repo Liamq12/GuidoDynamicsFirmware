@@ -81,10 +81,18 @@ struct valveData {
 };
 
 struct PID_Data {
-    double RPM_Target;
+	float RPM_Idle; // "Start" RPM
+    float RPM_Target; // PID RPM target
+    float RPM_End_Target; // RPM at the end
+    float RPM_Ramp_Rate; // RPM increase per second
+	int RPM_Count; // RPM cycle count
     int RPM_EN;
-    double TORQUE_Target;
-    int TORQUE_EN;
+    int RPM_Flag;
+    float KP; // Proportional term
+    float KI; // Integral term
+    float KD; // Derivative term
+    float accum; // Integral accumulation
+    float accumMax; // Max I accumulation
 };
 
 struct AlarmThresholds {

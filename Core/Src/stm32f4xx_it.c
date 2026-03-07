@@ -46,6 +46,11 @@
 int transmitReady = 0; // Flag for when UDP transmission packet is ready
 
 extern struct valveData valveData;
+extern struct PID_Data PID_Data;
+extern struct dataPacket dataPacketNow;
+extern struct dataPacket dataPacketPrev;
+
+int sameCount = 0;
 
 extern int pulsesToGo;
 /* USER CODE END PV */
@@ -67,6 +72,7 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim8;
+extern TIM_HandleTypeDef htim13;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -233,7 +239,15 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
- valveData.intFlag = 1;
+
+  valveData.intFlag = 1;
+
+  if(dataPacketNow.RPM == dataPacketPrev.RPM){
+	  sameCount++;
+	  if(sameCount >= 12){
+		  dataPacketNow.RPM = 0;
+	  }
+  }
   /* USER CODE END TIM3_IRQn 1 */
 }
 
@@ -248,15 +262,21 @@ void TIM4_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
   if(pulsesToGo != 0){
-	  if((valveData.positionInSteps >= (valveData.pulsesPerRev/2) && ((DIO2_GPIO_Port->ODR & DIO2_Pin) != 0)) || (valveData.positionInSteps <= 0 && ((DIO2_GPIO_Port->ODR & DIO2_Pin) == 0))){
-		  return;
+	  if(valveData.polarity == 1){
+		  if((valveData.positionInSteps >= (valveData.pulsesPerRev) && ((DIO2_GPIO_Port->ODR & DIO2_Pin) != 0)) || (valveData.positionInSteps <= 0 && ((DIO2_GPIO_Port->ODR & DIO2_Pin) == 0))){
+			  return;
+		  }
+	  }else{
+		  if((valveData.positionInSteps >= (valveData.pulsesPerRev) && ((DIO2_GPIO_Port->ODR & DIO2_Pin) == 0)) || (valveData.positionInSteps <= 0 && ((DIO2_GPIO_Port->ODR & DIO2_Pin) != 0))){
+			  return;
+		  }
 	  }
 	  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
 	  pulsesToGo--;
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
-		  valveData.positionInSteps += 0.5;
+		  valveData.positionInSteps += 0.5 * valveData.polarity;
 	  }else{
-		  valveData.positionInSteps -= 0.5;
+		  valveData.positionInSteps -= 0.5 * valveData.polarity;
 	  }
   }else{
 	  //HAL_NVIC_DisableIRQ(TIM4_IRQn);
@@ -264,6 +284,23 @@ void TIM4_IRQHandler(void)
   }
 
   /* USER CODE END TIM4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM8 update interrupt and TIM13 global interrupt.
+  */
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 0 */
+
+  /* USER CODE END TIM8_UP_TIM13_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim8);
+  HAL_TIM_IRQHandler(&htim13);
+  /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 1 */
+  if(PID_Data.RPM_EN == 1){
+	  PID_Data.RPM_Flag = 1;
+  }
+  /* USER CODE END TIM8_UP_TIM13_IRQn 1 */
 }
 
 /**

@@ -5,4 +5,6 @@ void zeroValve();
 void valveControlLoop();
 void generatePulses(int pulses, int direction);
 
+void PID_OP_PT();
+
 #endif /* INC_VALVECONTROL_H_ */

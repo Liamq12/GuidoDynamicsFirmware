@@ -1,2 +1,3 @@
-../Core/Src/valveControl.c:25:6:valveControlLoop	16	static
-../Core/Src/valveControl.c:48:6:generatePulses	16	static
+../Core/Src/valveControl.c:31:6:valveControlLoop	16	static
+../Core/Src/valveControl.c:54:6:generatePulses	16	static
+../Core/Src/valveControl.c:64:6:PID_OP_PT	16	static
