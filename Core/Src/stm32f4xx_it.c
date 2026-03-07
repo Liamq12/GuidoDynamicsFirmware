@@ -241,11 +241,13 @@ void TIM3_IRQHandler(void)
   /* USER CODE BEGIN TIM3_IRQn 1 */
 
   valveData.intFlag = 1;
+  PID_Data.RPMS_Flag = 1;
 
   if(dataPacketNow.RPM == dataPacketPrev.RPM){
 	  sameCount++;
 	  if(sameCount >= 12){
 		  dataPacketNow.RPM = 0;
+		  sameCount = 0;
 	  }
   }
   /* USER CODE END TIM3_IRQn 1 */

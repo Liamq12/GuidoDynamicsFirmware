@@ -93,6 +93,9 @@ struct PID_Data {
     float KD; // Derivative term
     float accum; // Integral accumulation
     float accumMax; // Max I accumulation
+    float rpms[10]; // Collection of previous rpms for ROC calcs
+    float avgRPMROC; // Average RPM rate of change
+    int RPMS_Flag; // Tells when to store RPM value
 };
 
 struct AlarmThresholds {

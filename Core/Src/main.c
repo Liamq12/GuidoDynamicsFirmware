@@ -150,10 +150,10 @@ int main(void)
   valveData.gearReduction = 1;
   valveData.positionInSteps = 0;
 
-  PID_Data.RPM_Target = 800;
-  PID_Data.KP = 0.7f;
+  PID_Data.RPM_Target = 400;
+  PID_Data.KP = 1.0f;
   PID_Data.KI = 0.0f;
-  PID_Data.KD = 0.0f;
+  PID_Data.KD = 150.0f;
   PID_Data.accum = 0.0f;
   PID_Data.accumMax = 10.0f;
 
@@ -178,6 +178,20 @@ int main(void)
 	  if(PID_Data.RPM_Flag == 1){
 		  PID_OP_PT();
 	  }
+
+	  if(PID_Data.RPMS_Flag){
+		  PID_Data.RPMS_Flag = 0;
+		  for(uint8_t i = 0; i < (sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]))-1; i++){
+			  PID_Data.rpms[i+1] = PID_Data.rpms[i];
+		  }
+		  PID_Data.rpms[0] = dataPacketNow.RPM;
+	  }
+//      if(PID_Data.RPMS_Flag == 1){
+//		  PID_Data.RPMS_Flag = 0;
+//		  for(uint8_t i = 0; i < sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]); i++){
+//
+//		  }
+//      }
 
       int16_t rawValue = ADS1115_ReadChannel(0);
       float voltage = ADS1115_ConvertToVoltage(rawValue);
@@ -425,7 +439,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 50-1;
+  htim3.Init.Prescaler = 100-1;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 65535;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

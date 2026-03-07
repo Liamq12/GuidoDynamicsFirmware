@@ -64,8 +64,17 @@ void generatePulses(int pulses, int direction){
 void PID_OP_PT(){
 	// PID_Data.RPM_Target = ((PID_Data.RPM_Count/100) * PID_Data.RPM_Ramp_Rate) + PID_Data.RPM_Idle;
 	float error = PID_Data.RPM_Target - dataPacketNow.RPM;
+
 	PID_Data.accum += error * PID_Data.KI;
 	PID_Data.accum = CLAMP(PID_Data.accum, 0, PID_Data.accumMax);
-	float correction = (error*PID_Data.KP) + (PID_Data.accum);
+
+	float sumOfROC = 0.0f;
+	for(uint8_t i = 0; i < (sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]))-1; i++){
+		sumOfROC += PID_Data.rpms[i] - PID_Data.rpms[i+1];
+	}
+	sumOfROC = sumOfROC/((sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]))-1);
+	PID_Data.avgRPMROC = sumOfROC;
+
+	float correction = (error*PID_Data.KP) + (PID_Data.accum) - (PID_Data.avgRPMROC*PID_Data.KD);
 	valveData.targetPosition = valveData.position - correction;
 }
