@@ -87,6 +87,7 @@ struct PID_Data {
     float RPM_Ramp_Rate; // RPM increase per second
 	int RPM_Count; // RPM cycle count
     int RPM_EN;
+    int RPM_RAMP_EN;
     int RPM_Flag;
     float KP; // Proportional term
     float KI; // Integral term

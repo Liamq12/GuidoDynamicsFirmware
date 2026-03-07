@@ -61,6 +61,10 @@ void generatePulses(int pulses, int direction){
 //	isZeroing = 1;
 //}
 
+void ramp(){
+
+}
+
 void PID_OP_PT(){
 	// PID_Data.RPM_Target = ((PID_Data.RPM_Count/100) * PID_Data.RPM_Ramp_Rate) + PID_Data.RPM_Idle;
 	float error = PID_Data.RPM_Target - dataPacketNow.RPM;

@@ -51,6 +51,7 @@ extern struct dataPacket dataPacketNow;
 extern struct dataPacket dataPacketPrev;
 
 int sameCount = 0;
+double lastRPM = 0;
 
 extern int pulsesToGo;
 /* USER CODE END PV */
@@ -243,12 +244,16 @@ void TIM3_IRQHandler(void)
   valveData.intFlag = 1;
   PID_Data.RPMS_Flag = 1;
 
-  if(dataPacketNow.RPM == dataPacketPrev.RPM){
+  if(dataPacketNow.RPM == lastRPM){
 	  sameCount++;
 	  if(sameCount >= 12){
 		  dataPacketNow.RPM = 0;
+		  lastRPM = 0;
 		  sameCount = 0;
 	  }
+  }else{
+	  sameCount = 0;
+	  lastRPM = dataPacketNow.RPM;
   }
   /* USER CODE END TIM3_IRQn 1 */
 }
@@ -277,6 +282,7 @@ void TIM4_IRQHandler(void)
 	  pulsesToGo--;
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
 		  valveData.positionInSteps += 0.5 * valveData.polarity;
+
 	  }else{
 		  valveData.positionInSteps -= 0.5 * valveData.polarity;
 	  }

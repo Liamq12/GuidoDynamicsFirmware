@@ -86,7 +86,7 @@ void udpClient_send(void)
   struct pbuf *txBuf;
   char data[800];
 
-  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", %f],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", %f],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, dataPacketNow.temp, PID_Data.avgRPMROC, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
+  int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", %f],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", %f],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, dataPacketNow.temp, PID_Data.RPM_Target, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
 
   /* allocate pbuf from pool*/
   txBuf = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
@@ -149,13 +149,17 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     	if(strcmp(subCWBuffer, "RPM") == 0){
     		PID_Data.RPM_Target = (float) num;
     	}
+    }else if(strcmp(CWBuffer, "ENPID") == 0){
+    	if(strcmp(subCWBuffer, "RPM") == 0){
+    		PID_Data.RPM_EN = (int) num;
+    	}
     }else if(strcmp(CWBuffer, "FRAMP") == 0){
     	if(strcmp(subCWBuffer, "RPM") == 0){
     		PID_Data.RPM_End_Target = (float) num;
     	}else if(strcmp(subCWBuffer, "RTE") == 0){
     		PID_Data.RPM_Ramp_Rate = (float) num;
     	}else if(strcmp(subCWBuffer, "ENA") == 0){
-    		PID_Data.RPM_EN = (int) num;
+    		PID_Data.RPM_RAMP_EN = (int) num;
     	}else if(strcmp(subCWBuffer, "IMX") == 0){
     		PID_Data.accumMax = (float) num;
     	}else if(strcmp(subCWBuffer, "KPT") == 0){

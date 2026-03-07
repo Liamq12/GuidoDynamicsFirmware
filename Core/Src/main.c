@@ -31,6 +31,7 @@
 /* USER CODE BEGIN PTD */
 #define HALL_INDUCTANCE SpeedInduction_Pin
 #define PULSE_PER_REV 50
+#define RAMP_TIMER_FREQUENCY 15
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -185,6 +186,13 @@ int main(void)
 			  PID_Data.rpms[i+1] = PID_Data.rpms[i];
 		  }
 		  PID_Data.rpms[0] = dataPacketNow.RPM;
+
+		  if(PID_Data.RPM_RAMP_EN == 1){
+			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
+			  if(PID_Data.RPM_Target >= PID_Data.RPM_End_Target){
+				  PID_Data.RPM_RAMP_EN = 0;
+			  }
+		  }
 	  }
 //      if(PID_Data.RPMS_Flag == 1){
 //		  PID_Data.RPMS_Flag = 0;
@@ -439,9 +447,9 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 100-1;
+  htim3.Init.Prescaler = 10000-1;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 560-1;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
