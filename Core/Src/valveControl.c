@@ -21,7 +21,7 @@
 #define CLAMP(x, min, max)  ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
 int pulseDiff;
-int pulsesToGo;
+float pulsesToGo;
 int isZeroing;
 
 extern struct valveData valveData;

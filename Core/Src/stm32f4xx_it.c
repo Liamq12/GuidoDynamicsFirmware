@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "udpClientRAW.h"
 #include "valveControl.h"
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +54,7 @@ extern struct dataPacket dataPacketPrev;
 int sameCount = 0;
 double lastRPM = 0;
 
-extern int pulsesToGo;
+extern float pulsesToGo;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -278,13 +279,25 @@ void TIM4_IRQHandler(void)
 			  return;
 		  }
 	  }
-	  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-	  pulsesToGo--;
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
-		  valveData.positionInSteps += 0.5 * valveData.polarity;
+//		  valveData.positionInSteps += 0.5 * valveData.polarity;
+		  if(pulsesToGo < 1000){
+			  pulsesToGo -= 0.2f;
+		  }else{
+			  valveData.positionInSteps += 0.5 * valveData.polarity;
+			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+			  pulsesToGo--;
+		  }
+		  if(pulsesToGo < 1000 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.001f)){
+			  valveData.positionInSteps += 0.5 * valveData.polarity;
+			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+//			  pulsesToGo--;
+		  }
 
 	  }else{
 		  valveData.positionInSteps -= 0.5 * valveData.polarity;
+		  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+		  pulsesToGo--;
 	  }
   }else{
 	  //HAL_NVIC_DisableIRQ(TIM4_IRQn);

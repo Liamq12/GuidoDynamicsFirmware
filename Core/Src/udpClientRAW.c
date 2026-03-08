@@ -11,6 +11,8 @@
 
 #include "udpClientRAW.h"
 
+#define CLAMP(x, min, max)  ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port);
 //static void udpClient_send(void);
 
@@ -136,6 +138,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     // Check if the message is "Hello"
     if (strcmp(CWBuffer, "VALVE") == 0) {
         if(strcmp(subCWBuffer, "POS") == 0){
+        	num = CLAMP(num, 0, 100);
 			int stepPosition = (num/100)*valveData.pulsesPerRev;
 			valveData.targetPosition = stepPosition;
         }else if(strcmp(subCWBuffer, "ZER") == 0){
