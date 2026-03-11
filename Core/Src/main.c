@@ -151,12 +151,12 @@ int main(void)
   valveData.gearReduction = 1;
   valveData.positionInSteps = 0;
 
-  PID_Data.RPM_Target = 400;
-  PID_Data.KP = 1.0f;
-  PID_Data.KI = 0.0f;
-  PID_Data.KD = 150.0f;
+  PID_Data.RPM_Target = 800;
+  PID_Data.KP = 0.12f;
+  PID_Data.KI = 0.01f;
+  PID_Data.KD = 10.0f;
   PID_Data.accum = 0.0f;
-  PID_Data.accumMax = 10.0f;
+  PID_Data.accumMax = 1.0f;
 
   PID_Data.RPM_EN = 0;
 

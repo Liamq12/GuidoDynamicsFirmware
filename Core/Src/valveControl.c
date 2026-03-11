@@ -12,6 +12,7 @@
 
 #include "stdio.h"
 #include "string.h"
+#include "math.h"
 
 #include <main.h>
 
@@ -69,8 +70,8 @@ void PID_OP_PT(){
 	// PID_Data.RPM_Target = ((PID_Data.RPM_Count/100) * PID_Data.RPM_Ramp_Rate) + PID_Data.RPM_Idle;
 	float error = PID_Data.RPM_Target - dataPacketNow.RPM;
 
-	PID_Data.accum += error * PID_Data.KI;
-	PID_Data.accum = CLAMP(PID_Data.accum, 0, PID_Data.accumMax);
+	PID_Data.accum += error * (-PID_Data.KP*PID_Data.KI);
+	PID_Data.accum = CLAMP(PID_Data.accum, -PID_Data.accumMax, PID_Data.accumMax);
 
 	float sumOfROC = 0.0f;
 	for(uint8_t i = 0; i < (sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]))-1; i++){
@@ -79,6 +80,18 @@ void PID_OP_PT(){
 	sumOfROC = sumOfROC/((sizeof(PID_Data.rpms)/sizeof(PID_Data.rpms[0]))-1);
 	PID_Data.avgRPMROC = sumOfROC;
 
-	float correction = (error*PID_Data.KP) + (PID_Data.accum) - (PID_Data.avgRPMROC*PID_Data.KD);
-	valveData.targetPosition = valveData.position - correction;
+	float correction = (error*(-1)*PID_Data.KP) + (PID_Data.accum) - (PID_Data.avgRPMROC*(PID_Data.KD * PID_Data.KP));
+	if(correction <= 0.0){
+		correction = 0.0f;
+	}else if(correction >= 1.0){
+		correction = 1.0f;
+	}
+
+	//if(dataPacketNow.RPM >= 500){
+//	correction /= 100;
+//	correction = CLAMP(correction, 0.0f, 1.0f);
+//	correction *= (float) (600/dataPacketNow.RPM);
+	//}
+	valveData.targetPosition = ((powf(10,correction)-1)/9)*100;
+//	valveData.targetPosition = valveData.position - correction; // Try adding factor that scales down the correction based on RPM
 }

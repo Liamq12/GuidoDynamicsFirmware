@@ -281,23 +281,36 @@ void TIM4_IRQHandler(void)
 	  }
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
 //		  valveData.positionInSteps += 0.5 * valveData.polarity;
-		  if(pulsesToGo < 1000){
-			  pulsesToGo -= 0.2f;
+		  if(valveData.positionInSteps <= 500){
+			  pulsesToGo -= 0.25f;
 		  }else{
 			  valveData.positionInSteps += 0.5 * valveData.polarity;
 			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
 			  pulsesToGo--;
 		  }
-		  if(pulsesToGo < 1000 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.001f)){
+		  if(valveData.positionInSteps <= 500 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.01f)){
 			  valveData.positionInSteps += 0.5 * valveData.polarity;
 			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
 //			  pulsesToGo--;
 		  }
 
 	  }else{
-		  valveData.positionInSteps -= 0.5 * valveData.polarity;
-		  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-		  pulsesToGo--;
+//		  valveData.positionInSteps -= 0.5 * valveData.polarity;
+//		  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+//		  pulsesToGo--;
+  //		  valveData.positionInSteps += 0.5 * valveData.polarity;
+		  if(valveData.positionInSteps <= 500){
+			  pulsesToGo -= 0.25f;
+		  }else{
+			  valveData.positionInSteps -= 0.5 * valveData.polarity;
+			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+			  pulsesToGo--;
+		  }
+		  if(valveData.positionInSteps <= 500 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.01f)){
+			  valveData.positionInSteps -= 0.5 * valveData.polarity;
+			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+  //			  pulsesToGo--;
+		  }
 	  }
   }else{
 	  //HAL_NVIC_DisableIRQ(TIM4_IRQn);
@@ -320,6 +333,8 @@ void TIM8_UP_TIM13_IRQHandler(void)
   /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 1 */
   if(PID_Data.RPM_EN == 1){
 	  PID_Data.RPM_Flag = 1;
+  }else{
+	  PID_Data.RPM_Flag = 0;
   }
   /* USER CODE END TIM8_UP_TIM13_IRQn 1 */
 }

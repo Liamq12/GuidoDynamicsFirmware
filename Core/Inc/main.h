@@ -76,7 +76,7 @@ struct valveData {
     int polarity;
     int intFlag;
     int pulseDiff;
-    double positionInSteps;
+    float positionInSteps;
     int zeroRoutine;
 };
 
