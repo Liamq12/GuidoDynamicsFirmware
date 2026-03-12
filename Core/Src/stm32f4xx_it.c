@@ -53,6 +53,7 @@ extern struct dataPacket dataPacketPrev;
 
 int sameCount = 0;
 double lastRPM = 0;
+int slowDown = 0;
 
 extern float pulsesToGo;
 /* USER CODE END PV */
@@ -269,7 +270,12 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-  if(pulsesToGo != 0){
+  if(valveData.targetPosition != valveData.positionInSteps){
+	  if(valveData.targetPosition < valveData.positionInSteps){
+		  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 1);
+	  }else{
+		  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
+	  }
 	  if(valveData.polarity == 1){
 		  if((valveData.positionInSteps >= (valveData.pulsesPerRev) && ((DIO2_GPIO_Port->ODR & DIO2_Pin) != 0)) || (valveData.positionInSteps <= 0 && ((DIO2_GPIO_Port->ODR & DIO2_Pin) == 0))){
 			  return;
@@ -280,41 +286,22 @@ void TIM4_IRQHandler(void)
 		  }
 	  }
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
-//		  valveData.positionInSteps += 0.5 * valveData.polarity;
-		  if(valveData.positionInSteps <= 500){
-			  pulsesToGo -= 0.25f;
+		  if(valveData.positionInSteps <= 1000 && slowDown < 5){
+			  slowDown++;
 		  }else{
-			  valveData.positionInSteps += 0.5 * valveData.polarity;
+			  valveData.positionInSteps -= 0.5;
 			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-			  pulsesToGo--;
+			  slowDown = 0;
 		  }
-		  if(valveData.positionInSteps <= 500 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.01f)){
-			  valveData.positionInSteps += 0.5 * valveData.polarity;
-			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-//			  pulsesToGo--;
-		  }
-
 	  }else{
-//		  valveData.positionInSteps -= 0.5 * valveData.polarity;
-//		  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-//		  pulsesToGo--;
-  //		  valveData.positionInSteps += 0.5 * valveData.polarity;
-		  if(valveData.positionInSteps <= 500){
-			  pulsesToGo -= 0.25f;
+		  if(valveData.positionInSteps <= 1000 && slowDown < 5){
+			  slowDown++;
 		  }else{
-			  valveData.positionInSteps -= 0.5 * valveData.polarity;
+			  valveData.positionInSteps += 0.5;
 			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-			  pulsesToGo--;
-		  }
-		  if(valveData.positionInSteps <= 500 && (fabsf(fmodf(pulsesToGo, 1.0f)) < 0.01f)){
-			  valveData.positionInSteps -= 0.5 * valveData.polarity;
-			  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
-  //			  pulsesToGo--;
+			  slowDown = 0;
 		  }
 	  }
-  }else{
-	  //HAL_NVIC_DisableIRQ(TIM4_IRQn);
-	  pulsesToGo = 0;
   }
 
   /* USER CODE END TIM4_IRQn 1 */

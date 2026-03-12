@@ -1,4 +1,4 @@
-../Core/Src/valveControl.c:32:6:valveControlLoop	16	static
-../Core/Src/valveControl.c:55:6:generatePulses	16	static
-../Core/Src/valveControl.c:65:6:ramp	4	static
-../Core/Src/valveControl.c:69:6:PID_OP_PT	24	static
+../Core/Src/valveControl.c:32:6:valveControlLoop	4	static
+../Core/Src/valveControl.c:59:6:generatePulses	16	static
+../Core/Src/valveControl.c:70:6:ramp	4	static
+../Core/Src/valveControl.c:74:6:PID_OP_PT	24	static

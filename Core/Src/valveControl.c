@@ -31,31 +31,36 @@ extern struct dataPacket dataPacketNow;
 
 void valveControlLoop(void){
 	if(valveData.position != valveData.targetPosition){
-		valveData.pulseDiff = valveData.targetPosition - valveData.position;
 		valveData.position = valveData.targetPosition;
-		int direction = 1;
-		//HAL_NVIC_EnableIRQ(TIM4_IRQn);
-		if(valveData.polarity >= 1 && valveData.pulseDiff >= 1){
-			direction = 1;
-			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
-		}else if(valveData.polarity >= 1 && valveData.pulseDiff <= 0){
-			direction = 0;
-			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
-		}else if(valveData.polarity <= 0 && valveData.pulseDiff <= 0){
-			direction = 1;
-			generatePulses(abs(valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
-		}else if(valveData.polarity <= 0 && valveData.pulseDiff >= 1){
-			direction = 0;
-			generatePulses(abs(valveData.pulseDiff), direction);
-		}
+
+
+
+//		valveData.pulseDiff = valveData.targetPosition - valveData.position;
+//		valveData.position = valveData.targetPosition;
+//		int direction = 1;
+//		//HAL_NVIC_EnableIRQ(TIM4_IRQn);
+//		if(valveData.polarity >= 1 && valveData.pulseDiff >= 1){
+//			direction = 1;
+//			generatePulses((valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+//		}else if(valveData.polarity >= 1 && valveData.pulseDiff <= 0){
+//			direction = 0;
+//			generatePulses((valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+//		}else if(valveData.polarity <= 0 && valveData.pulseDiff <= 0){
+//			direction = 1;
+//			generatePulses((valveData.pulseDiff), direction); // Put this in if statement to skip if not valid
+//		}else if(valveData.polarity <= 0 && valveData.pulseDiff >= 1){
+//			direction = 0;
+//			generatePulses((valveData.pulseDiff), direction);
+//		}
 	}
 	valveData.intFlag = 0;
 }
 
 void generatePulses(int pulses, int direction){
-	HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, direction);
+//	HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, direction);
 	HAL_GPIO_WritePin(DIO3_GPIO_Port, DIO3_Pin, 0); // start low
-	pulsesToGo = 2*pulses; // Two times the number of pulses, due to toggle logic
+	pulsesToGo = pulses;
+
 }
 
 //void zeroValve(){
@@ -92,6 +97,6 @@ void PID_OP_PT(){
 //	correction = CLAMP(correction, 0.0f, 1.0f);
 //	correction *= (float) (600/dataPacketNow.RPM);
 	//}
-	valveData.targetPosition = ((powf(10,correction)-1)/9)*100;
+	valveData.targetPosition = (((powf(10,correction)-1)/9)*valveData.pulsesPerRev);
 //	valveData.targetPosition = valveData.position - correction; // Try adding factor that scales down the correction based on RPM
 }
