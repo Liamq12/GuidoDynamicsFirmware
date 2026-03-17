@@ -4807,11 +4807,11 @@ void udpClient_send(void)
  80024e0:	e92d 4fb0 	stmdb	sp!, {r4, r5, r7, r8, r9, sl, fp, lr}
  80024e4:	f5ad 7d56 	sub.w	sp, sp, #856	@ 0x358
  80024e8:	af0a      	add	r7, sp, #40	@ 0x28
-//  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, 0);
 
   struct pbuf *txBuf;
   char data[800];
 
+  // Add term for acceleration
   int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", %f],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", %f],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, dataPacketNow.temp, PID_Data.RPM_Target, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
  80024ea:	4b33      	ldr	r3, [pc, #204]	@ (80025b8 <udpClient_send+0xd8>)
  80024ec:	e9d3 ab02 	ldrd	sl, fp, [r3, #8]
@@ -5485,14 +5485,14 @@ void PID_OP_PT(){
 //	correction = CLAMP(correction, 0.0f, 1.0f);
 //	correction *= (float) (600/dataPacketNow.RPM);
 	//}
-	valveData.targetPosition = (((powf(10,correction)-1)/9)*valveData.pulsesPerRev);
+	valveData.targetPosition = (((powf(4,correction)-1)/3)*valveData.pulsesPerRev);
  8002ac6:	edd7 0a01 	vldr	s1, [r7, #4]
- 8002aca:	eeb2 0a04 	vmov.f32	s0, #36	@ 0x41200000  10.0
+ 8002aca:	eeb1 0a00 	vmov.f32	s0, #16	@ 0x40800000  4.0
  8002ace:	f014 f8c1 	bl	8016c54 <powf>
  8002ad2:	eef0 7a40 	vmov.f32	s15, s0
  8002ad6:	eeb7 7a00 	vmov.f32	s14, #112	@ 0x3f800000  1.0
  8002ada:	ee77 7ac7 	vsub.f32	s15, s15, s14
- 8002ade:	eef2 6a02 	vmov.f32	s13, #34	@ 0x41100000  9.0
+ 8002ade:	eef0 6a08 	vmov.f32	s13, #8	@ 0x40400000  3.0
  8002ae2:	ee87 7aa6 	vdiv.f32	s14, s15, s13
  8002ae6:	4b0b      	ldr	r3, [pc, #44]	@ (8002b14 <PID_OP_PT+0x1c0>)
  8002ae8:	681b      	ldr	r3, [r3, #0]
