@@ -67,6 +67,8 @@ uint32_t timerPrev = 0;
 
 uint16_t adc_buf[16];
 
+int ringsDebounce = 0;
+
 struct valveData valveData;
 struct PID_Data PID_Data;
 /* USER CODE END PV */
@@ -92,6 +94,8 @@ static void MX_TIM13_Init(void);
 extern struct netif gnetif;
 extern struct dataPacket dataPacketNow;
 extern struct dataPacket dataPacketPrev;
+
+extern int rings;
 /* USER CODE END 0 */
 
 /**
@@ -160,6 +164,11 @@ int main(void)
 
   PID_Data.RPM_EN = 0;
 
+  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
+  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
+
+  rings = 2;
+
 //  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
 //  HAL_NVIC_DisableIRQ(TIM4_IRQn);
@@ -188,9 +197,15 @@ int main(void)
 		  PID_Data.rpms[0] = dataPacketNow.RPM;
 
 		  if(PID_Data.RPM_RAMP_EN == 1){
+			  if(ringsDebounce == 0){
+				  rings = 1;
+				  ringsDebounce = 1;
+			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
 			  if(PID_Data.RPM_Target >= PID_Data.RPM_End_Target){
+				  rings = 4;
 				  PID_Data.RPM_RAMP_EN = 0;
+				  ringsDebounce = 0;
 			  }
 		  }
 	  }
@@ -628,7 +643,7 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
@@ -646,21 +661,28 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, AL2_Pin|AL1_Pin|LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DIO3_GPIO_Port, DIO3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : AL2_Pin AL1_Pin LED_Pin */
+  GPIO_InitStruct.Pin = AL2_Pin|AL1_Pin|LED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DIO3_Pin */
   GPIO_InitStruct.Pin = DIO3_Pin;
@@ -668,13 +690,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(DIO3_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LED_Pin */
-  GPIO_InitStruct.Pin = LED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DIO2_Pin */
   GPIO_InitStruct.Pin = DIO2_Pin;

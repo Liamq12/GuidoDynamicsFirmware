@@ -55,6 +55,13 @@ int sameCount = 0;
 double lastRPM = 0;
 int slowDown = 0;
 
+int ringPSC = 0;
+int ringPSCG = 0;
+int rings = 0;
+int ringStatus = 0;
+int ringGroupsCount = 0;
+int ohFuckOhShit = 0; // High to override bell algorithm and ring the bell until power cycled
+
 extern float pulsesToGo;
 /* USER CODE END PV */
 
@@ -248,7 +255,7 @@ void TIM3_IRQHandler(void)
 
   if(dataPacketNow.RPM == lastRPM){
 	  sameCount++;
-	  if(sameCount >= 12){
+	  if(sameCount >= 20){
 		  dataPacketNow.RPM = 0;
 		  lastRPM = 0;
 		  sameCount = 0;
@@ -322,6 +329,39 @@ void TIM8_UP_TIM13_IRQHandler(void)
 	  PID_Data.RPM_Flag = 1;
   }else{
 	  PID_Data.RPM_Flag = 0;
+  }
+
+  if(ohFuckOhShit == 0){
+	  if(rings > 0 && ringStatus == 0){
+		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1); // Ring the bell
+		  ringGroupsCount++;
+		  ringStatus = 1; // This should really be a register read of the output register
+	  }else if(rings > 0 && ringStatus == 1 && ringPSC < 10){
+		  ringPSC++;
+	  }else if(rings > 0 && ringStatus == 1 && ringPSC >= 10){
+		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0); // Stop the bell
+		  ringPSCG = 0;
+		  ringStatus = 2;
+		  ringPSC = 0;
+		  rings--;
+	  }else if(ringStatus == 2 && ringPSC < 10){
+		  if(ringGroupsCount % 2 == 0){
+			  if(ringPSCG < 20){
+				  ringPSCG++;
+			  }else{
+				  ringPSC++;
+			  }
+		  }else{
+			  ringPSC++;
+		  }
+	  }else if(ringStatus == 2 && ringPSC >= 10){
+		  ringStatus = 0;
+		  ringPSC = 0;
+	  }else if(rings == 0){
+		  ringGroupsCount = 0;
+	  }
+  }else{
+	  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1);
   }
   /* USER CODE END TIM8_UP_TIM13_IRQn 1 */
 }
