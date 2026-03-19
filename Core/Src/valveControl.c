@@ -95,7 +95,7 @@ void PID_OP_PT(){
 	//if(dataPacketNow.RPM >= 500){
 //	correction /= 100;
 //	correction = CLAMP(correction, 0.0f, 1.0f);
-//	correction *= (float) (600/dataPacketNow.RPM);
+	correction *= (float) (900/dataPacketNow.RPM); // Square - 1.5 the rpm term
 	//}
 	valveData.targetPosition = (((powf(4,correction)-1)/3)*valveData.pulsesPerRev);
 //	valveData.targetPosition = valveData.position - correction; // Try adding factor that scales down the correction based on RPM

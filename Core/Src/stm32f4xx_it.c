@@ -286,7 +286,7 @@ void TIM4_IRQHandler(void)
 		  }
 	  }
 	  if(DIO2_GPIO_Port->ODR & DIO2_Pin){
-		  if(valveData.positionInSteps <= 1000 && slowDown < 5){
+		  if(valveData.positionInSteps <= 6000 && slowDown < 5){
 			  slowDown++;
 		  }else{
 			  valveData.positionInSteps -= 0.5;
@@ -294,7 +294,7 @@ void TIM4_IRQHandler(void)
 			  slowDown = 0;
 		  }
 	  }else{
-		  if(valveData.positionInSteps <= 1000 && slowDown < 5){
+		  if(valveData.positionInSteps <= 6000 && slowDown < 5){
 			  slowDown++;
 		  }else{
 			  valveData.positionInSteps += 0.5;
