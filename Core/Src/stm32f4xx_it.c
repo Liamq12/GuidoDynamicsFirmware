@@ -62,6 +62,13 @@ int ringStatus = 0;
 int ringGroupsCount = 0;
 int ohFuckOhShit = 0; // High to override bell algorithm and ring the bell until power cycled
 
+extern int dataBatchingMax; // Should be a define/constant, or query length of
+extern int dataBatchingIndex;
+extern struct dataPacket dataArray[];
+extern struct valveData valveArray[];
+extern struct PID_Data PIDArray[];
+
+
 extern float pulsesToGo;
 /* USER CODE END PV */
 
@@ -81,6 +88,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim7;
 extern TIM_HandleTypeDef htim8;
 extern TIM_HandleTypeDef htim13;
 /* USER CODE BEGIN EV */
@@ -378,6 +386,25 @@ void TIM8_CC_IRQHandler(void)
   /* USER CODE BEGIN TIM8_CC_IRQn 1 */
 
   /* USER CODE END TIM8_CC_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM7 global interrupt.
+  */
+void TIM7_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM7_IRQn 0 */
+
+  /* USER CODE END TIM7_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim7);
+  /* USER CODE BEGIN TIM7_IRQn 1 */
+  if(dataBatchingIndex < dataBatchingMax){
+	  dataArray[dataBatchingIndex] = dataPacketNow;
+	  valveArray[dataBatchingIndex] = valveData;
+	  PIDArray[dataBatchingIndex] = PID_Data;
+  	  dataBatchingIndex++;
+  }
+  /* USER CODE END TIM7_IRQn 1 */
 }
 
 /**
