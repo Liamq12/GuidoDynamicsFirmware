@@ -70,6 +70,8 @@ uint16_t adc_buf[16];
 
 int ringsDebounce = 0;
 
+float KI_Storage = 0.0f;
+
 struct valveData valveData;
 struct PID_Data PID_Data;
 /* USER CODE END PV */
@@ -202,12 +204,16 @@ int main(void)
 
 		  if(PID_Data.RPM_RAMP_EN == 1){
 			  if(ringsDebounce == 0){
+				  KI_Storage = PID_Data.KI;
+				  PID_Data.KI = 0;
 				  rings = 1;
 				  ringsDebounce = 1;
 			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
 			  if(PID_Data.RPM_Target >= PID_Data.RPM_End_Target){
 				  rings = 4;
+				  PID_Data.KI = KI_Storage;
+				  KI_Storage = 0;
 				  PID_Data.RPM_RAMP_EN = 0;
 				  ringsDebounce = 0;
 			  }

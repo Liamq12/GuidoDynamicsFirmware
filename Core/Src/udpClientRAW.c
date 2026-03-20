@@ -98,29 +98,60 @@ void udpClient_send(void)
 
   // Add term for acceleration
   // int len = sprintf(data, "{\"device\": \"DAQ1\",\"uptime\": 40284,\"id\": 1,\"headers\": [\"metric\", \"time\", \"unit\", \"value\"],\"data\": [[\"wheelSpeed\", 2039, \"RPM\", %f],[\"dynoLoad\", 2039, \"lbf\", %f],[\"ambTemp\", 2039, \"C\", %f],[\"ambPressure\", 2039, \"PSI\", 68],[\"ambHumidity\", 2039, \"RH\", 21],[\"outletTemp\", 2039, \"C\", %f],[\"tankTemp\", 2039, \"C\", 43],[\"alarm1\", 2039, \"bool\", 1],[\"alarm2\", 2039, \"bool\", 0],[\"valvePosition\", 2039, \"p\", %f],[\"loadThresh\", 2039, \"lbf\", 400],[\"eStop\", 2039, \"bool\", 0],[\"status\", 2039, \"errorCode\", %d]]}", dataPacketNow.RPM, dataPacketNow.force, dataPacketNow.temp, PID_Data.RPM_Target, (valveData.positionInSteps/valveData.pulsesPerRev)*100, valveData.targetPosition);
+//
+//  int len = 0;
+//  len += sprintf(data + len, "{\"device\":\"DAQ1\",\"uptime\":%lu,\"id\":1,", HAL_GetTick());
+//  len += sprintf(data + len, "\"headers\":[\"metric\",\"time\",\"unit\",\"value\"],");
+//  for(int i = 0; i < dataBatchingMax; i++){
+//	  len += sprintf(data + len, "\"data%d\":[", i);
+//	  len += sprintf(data + len, "[\"wheelSpeed\",\"RPM\",%.2f],",    dataArray[i].RPM);
+//	  len += sprintf(data + len, "[\"dynoLoad\",\"lbf\",%.2f],",      dataArray[i].force);
+////	  len += sprintf(data + len, "[\"ambTemp\",\"C\",%.2f],",         dataArray[i].temp);
+////	  len += sprintf(data + len, "[\"ambPressure\",\"PSI\",68],"      );
+////	  len += sprintf(data + len, "[\"ambHumidity\",\"RH\",21],"       );
+////	  len += sprintf(data + len, "[\"outletTemp\",\"C\",42],"         );
+////	  len += sprintf(data + len, "[\"tankTemp\",\"C\",43],"           );
+////	  len += sprintf(data + len, "[\"alarm1\",\"bool\",1],"           );
+////	  len += sprintf(data + len, "[\"alarm2\",\"bool\",0],"           );
+//	  len += sprintf(data + len, "[\"RPMTarget\",\"RPM\",%.2f],",     PIDArray[i].RPM_Target);
+//	  len += sprintf(data + len, "[\"valvePosition\",\"p\",%.2f],",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
+////	  len += sprintf(data + len, "[\"loadThresh\",\"lbf\",400],"      );
+//	  len += sprintf(data + len, "[\"accel\",\"rpm/s\",%.2f]",       dataArray[i].acceleration);
+////	  len += sprintf(data + len, "[\"eStop\",\"bool\",0],"            );
+////	  len += sprintf(data + len, "[\"status\",\"errorCode\",%d]",     valveArray[i].targetPosition);
+//	  if(i != dataBatchingMax - 1){
+//		  len += sprintf(data + len, "],");
+//	  }else{
+//		  len += sprintf(data + len, "]");
+//	  }
+//  }
+//  len += sprintf(data + len, "]}");
 
   int len = 0;
-  len += sprintf(data + len, "{\"device\":\"DAQ1\",\"uptime\":%lu,\"id\":1,", HAL_GetTick());
-  len += sprintf(data + len, "\"headers\":[\"metric\",\"time\",\"unit\",\"value\"],");
+  len += snprintf(data + len, sizeof(data) - len, "{\"device\":\"DAQ1\",\"uptime\":%lu,\"id\":1,", HAL_GetTick());
+  len += snprintf(data + len, sizeof(data) - len, "\"data\": {");
+  len += snprintf(data + len, sizeof(data) - len, "\"headers\":[\"metric\",\"unit\",\"value\"],");
+  len += snprintf(data + len, sizeof(data) - len, "\"freq\": 10,");
+  len += snprintf(data + len, sizeof(data) - len, "\"cycles\": 10,");
+
   for(int i = 0; i < dataBatchingMax; i++){
-	  len += sprintf(data + len, "\"data%d\":[", i);
-	  len += sprintf(data + len, "[\"wheelSpeed\",\"RPM\",%.2f],",    dataArray[i].RPM);
-	  len += sprintf(data + len, "[\"dynoLoad\",\"lbf\",%.2f],",      dataArray[i].force);
-//	  len += sprintf(data + len, "[\"ambTemp\",\"C\",%.2f],",         dataArray[i].temp);
-//	  len += sprintf(data + len, "[\"ambPressure\",\"PSI\",68],"      );
-//	  len += sprintf(data + len, "[\"ambHumidity\",\"RH\",21],"       );
-//	  len += sprintf(data + len, "[\"outletTemp\",\"C\",42],"         );
-//	  len += sprintf(data + len, "[\"tankTemp\",\"C\",43],"           );
-//	  len += sprintf(data + len, "[\"alarm1\",\"bool\",1],"           );
-//	  len += sprintf(data + len, "[\"alarm2\",\"bool\",0],"           );
-	  len += sprintf(data + len, "[\"RPMTarget\",\"RPM\",%.2f],",     PIDArray[i].RPM_Target);
-	  len += sprintf(data + len, "[\"valvePosition\",\"p\",%.2f],",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
-//	  len += sprintf(data + len, "[\"loadThresh\",\"lbf\",400],"      );
-	  len += sprintf(data + len, "[\"accel\",\"rpm/s\",%.2f],",       dataArray[i].acceleration);
-//	  len += sprintf(data + len, "[\"eStop\",\"bool\",0],"            );
-//	  len += sprintf(data + len, "[\"status\",\"errorCode\",%d]",     valveArray[i].targetPosition);
-	  len += sprintf(data + len, "]}");
+      len += snprintf(data + len, sizeof(data) - len, "\"data%d\":[", i);
+      len += snprintf(data + len, sizeof(data) - len, "[\"wheelSpeed\",\"RPM\",%.2f],",    dataArray[i].RPM);
+      len += snprintf(data + len, sizeof(data) - len, "[\"dynoLoad\",\"lbf\",%f],",      dataArray[i].force);
+      len += snprintf(data + len, sizeof(data) - len, "[\"RPMTarget\",\"RPM\",%.2f],",     PIDArray[i].RPM_Target);
+      len += snprintf(data + len, sizeof(data) - len, "[\"valvePosition\",\"p\",%.2f]",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
+//      len += snprintf(data + len, sizeof(data) - len, "[\"accel\",\"rpm/s\",%.2f]",        dataArray[i].acceleration);
+//      len += snprintf(data + len, sizeof(data) - len, "[\"debug\",\"Test\",%d]", dataBatchingIndex);
+
+      if(i < dataBatchingMax - 1){
+          len += snprintf(data + len, sizeof(data) - len, "],"); // ← close data array, comma before next key
+      } else {
+          len += snprintf(data + len, sizeof(data) - len, "]");  // ← close last data array, no comma
+      }
   }
+
+  len += snprintf(data + len, sizeof(data) - len, "}}"); // ← close root object only, NO ]
+
   dataBatchingIndex = 0;
 
   /* allocate pbuf from pool*/
