@@ -138,7 +138,7 @@ void udpClient_send(void)
       len += snprintf(data + len, sizeof(data) - len, "\"data%d\":[", i);
       len += snprintf(data + len, sizeof(data) - len, "[\"wheelSpeed\",\"RPM\",%.2f],",    dataArray[i].RPM);
       len += snprintf(data + len, sizeof(data) - len, "[\"dynoLoad\",\"lbf\",%f],",      dataArray[i].force);
-      len += snprintf(data + len, sizeof(data) - len, "[\"RPMTarget\",\"RPM\",%.2f],",     PIDArray[i].RPM_Target);
+      len += snprintf(data + len, sizeof(data) - len, "[\"RPMTarget\",\"RPM\",%.2f]",     PIDArray[i].RPM_Target);
       len += snprintf(data + len, sizeof(data) - len, "[\"valvePosition\",\"p\",%.2f]",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
 //      len += snprintf(data + len, sizeof(data) - len, "[\"accel\",\"rpm/s\",%.2f]",        dataArray[i].acceleration);
 //      len += snprintf(data + len, sizeof(data) - len, "[\"debug\",\"Test\",%d]", dataBatchingIndex);
