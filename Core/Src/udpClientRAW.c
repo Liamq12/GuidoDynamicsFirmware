@@ -130,17 +130,17 @@ void udpClient_send(void)
   int len = 0;
   len += snprintf(data + len, sizeof(data) - len, "{\"device\":\"DAQ1\",\"uptime\":%lu,\"id\":1,", HAL_GetTick());
   len += snprintf(data + len, sizeof(data) - len, "\"data\": {");
-  len += snprintf(data + len, sizeof(data) - len, "\"headers\":[\"metric\",\"unit\",\"value\"],");
-  len += snprintf(data + len, sizeof(data) - len, "\"freq\": 10,");
+  len += snprintf(data + len, sizeof(data) - len, "\"headers\":[\"metric\",\"value\"],");
+  len += snprintf(data + len, sizeof(data) - len, "\"freq\": 20,");
   len += snprintf(data + len, sizeof(data) - len, "\"cycles\": 10,");
 
   for(int i = 0; i < dataBatchingMax; i++){
       len += snprintf(data + len, sizeof(data) - len, "\"data%d\":[", i);
-      len += snprintf(data + len, sizeof(data) - len, "[\"wheelSpeed\",\"RPM\",%.2f],",    dataArray[i].RPM);
-      len += snprintf(data + len, sizeof(data) - len, "[\"dynoLoad\",\"lbf\",%f],",      dataArray[i].force);
-      len += snprintf(data + len, sizeof(data) - len, "[\"RPMTarget\",\"RPM\",%.2f]",     PIDArray[i].RPM_Target);
-      len += snprintf(data + len, sizeof(data) - len, "[\"valvePosition\",\"p\",%.2f]",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
-//      len += snprintf(data + len, sizeof(data) - len, "[\"accel\",\"rpm/s\",%.2f]",        dataArray[i].acceleration);
+      len += snprintf(data + len, sizeof(data) - len, "[\"rSpd\",%.2f],",    dataArray[i].RPM);
+      len += snprintf(data + len, sizeof(data) - len, "[\"dyLd\",%f],",      dataArray[i].force);
+      len += snprintf(data + len, sizeof(data) - len, "[\"RPMT\",%.2f],",     PIDArray[i].RPM_Target);
+      len += snprintf(data + len, sizeof(data) - len, "[\"vPos\",%.2f],",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
+      len += snprintf(data + len, sizeof(data) - len, "[\"acel\",%.2f]",        dataArray[i].acceleration);
 //      len += snprintf(data + len, sizeof(data) - len, "[\"debug\",\"Test\",%d]", dataBatchingIndex);
 
       if(i < dataBatchingMax - 1){
@@ -175,7 +175,6 @@ void udpClient_send(void)
 
 void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16_t port)
 {
-
 
 	char CWBuffer[6];
 	char subCWBuffer[4];
