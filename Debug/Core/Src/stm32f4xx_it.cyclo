@@ -13,5 +13,5 @@
 ../Core/Src/stm32f4xx_it.c:328:6:TIM8_UP_TIM13_IRQHandler	18
 ../Core/Src/stm32f4xx_it.c:380:6:TIM8_CC_IRQHandler	1
 ../Core/Src/stm32f4xx_it.c:394:6:TIM7_IRQHandler	2
-../Core/Src/stm32f4xx_it.c:413:6:DMA2_Stream0_IRQHandler	1
-../Core/Src/stm32f4xx_it.c:427:6:ETH_IRQHandler	1
+../Core/Src/stm32f4xx_it.c:414:6:DMA2_Stream0_IRQHandler	1
+../Core/Src/stm32f4xx_it.c:428:6:ETH_IRQHandler	1
