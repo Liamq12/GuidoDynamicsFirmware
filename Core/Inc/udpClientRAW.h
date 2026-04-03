@@ -7,6 +7,7 @@ struct dataPacket {
     double temp;
     double humidity;
     double pressure;
+    double voc;
     double acceleration;
     char error[100];
 };

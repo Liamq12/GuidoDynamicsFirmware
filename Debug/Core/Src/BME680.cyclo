@@ -1,0 +1,6 @@
+../Core/Src/BME680.c:59:6:BME680_Init	1
+../Core/Src/BME680.c:114:6:BME680_ForceTrigger	1
+../Core/Src/BME680.c:135:7:BME680_ReadTemp	1
+../Core/Src/BME680.c:143:7:BME680_ReadPressure	1
+../Core/Src/BME680.c:165:7:BME680_ReadHumidity	1
+../Core/Src/BME680.c:175:7:BME680_ReadVOC	1

@@ -1,4 +1,5 @@
 "./Core/Src/ADS1115.o"
+"./Core/Src/BME680.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_it.o"

@@ -131,6 +131,9 @@ void udpClient_send(void)
   len += snprintf(data + len, sizeof(data) - len, "{\"device\":\"DAQ1\",\"uptime\":%lu,\"id\":1,", HAL_GetTick());
   len += snprintf(data + len, sizeof(data) - len, "\"data\": {");
   len += snprintf(data + len, sizeof(data) - len, "\"headers\":[\"metric\",\"value\"],");
+  len += snprintf(data + len, sizeof(data) - len, "\"tmp\": %.2f,", dataPacketNow.temp);
+  len += snprintf(data + len, sizeof(data) - len, "\"prs\": %.2f,", dataPacketNow.pressure);
+  len += snprintf(data + len, sizeof(data) - len, "\"hum\": %.2f,", dataPacketNow.humidity);
   len += snprintf(data + len, sizeof(data) - len, "\"freq\": 20,");
   len += snprintf(data + len, sizeof(data) - len, "\"cycles\": 10,");
 

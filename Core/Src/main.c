@@ -23,7 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "udpClientRAW.h"
-#include "ADS1115.H"
+#include "ADS1115.h"
+#include "BME680.h"
 #include "valveControl.h"
 /* USER CODE END Includes */
 
@@ -98,6 +99,8 @@ static void MX_TIM7_Init(void);
 extern struct netif gnetif;
 extern struct dataPacket dataPacketNow;
 extern struct dataPacket dataPacketPrev;
+
+extern int environmentalFlag;
 
 extern int rings;
 /* USER CODE END 0 */
@@ -175,6 +178,8 @@ int main(void)
 
   rings = 2;
 
+  BME680_Init();
+
 //  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
 //  HAL_NVIC_DisableIRQ(TIM4_IRQn);
@@ -228,6 +233,14 @@ int main(void)
 
       int16_t rawValue = ADS1115_ReadChannel(0);
       float voltage = ADS1115_ConvertToVoltage(rawValue);
+
+      if(environmentalFlag == 1){
+    	  BME680_ForceTrigger();
+    	  dataPacketNow.temp = BME680_ReadTemp();
+    	  dataPacketNow.pressure = BME680_ReadPressure();
+    	  dataPacketNow.humidity = BME680_ReadHumidity(dataPacketNow.temp);
+    	  environmentalFlag = 0;
+      }
 
 //      HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, 16);
 //      dataPacketNow.temp = (adc_buf[0] * 3.3) / 4096.0;

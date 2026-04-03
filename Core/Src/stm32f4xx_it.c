@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "udpClientRAW.h"
 #include "valveControl.h"
+#include "BME680.h"
 #include <math.h>
 /* USER CODE END Includes */
 
@@ -61,6 +62,8 @@ int rings = 0;
 int ringStatus = 0;
 int ringGroupsCount = 0;
 int ohFuckOhShit = 0; // High to override bell algorithm and ring the bell until power cycled
+
+int environmentalFlag = 0; // High takes measurement of BME680
 
 extern int dataBatchingMax; // Should be a define/constant, or query length of
 extern int dataBatchingIndex;
@@ -244,6 +247,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
   udpClient_send();
+  environmentalFlag = 1;
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
 
