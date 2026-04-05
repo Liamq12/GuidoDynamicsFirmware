@@ -103,6 +103,8 @@ extern struct dataPacket dataPacketPrev;
 extern int environmentalFlag;
 
 extern int rings;
+extern int isZeroing;
+extern int isZeroingInit;
 /* USER CODE END 0 */
 
 /**
@@ -176,9 +178,14 @@ int main(void)
   HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
   HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
 
+  HAL_Delay(1000);
+
   rings = 2;
 
   BME680_Init();
+
+  isZeroing = 1;
+  isZeroingInit = 1;
 
 //  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
@@ -744,6 +751,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ZERO_Pin */
+  GPIO_InitStruct.Pin = ZERO_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ZERO_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : DIO3_Pin */
   GPIO_InitStruct.Pin = DIO3_Pin;

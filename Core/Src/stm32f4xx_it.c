@@ -71,6 +71,9 @@ extern struct dataPacket dataArray[];
 extern struct valveData valveArray[];
 extern struct PID_Data PIDArray[];
 
+extern int isZeroing;
+extern int isZeroingInit;
+int zeroInc = 0;
 
 extern float pulsesToGo;
 /* USER CODE END PV */
@@ -289,6 +292,22 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
+  if(isZeroing == 1 && (valveData.targetPosition == valveData.positionInSteps)){
+	  if(isZeroingInit == 1){
+		  isZeroingInit = 0;
+		  valveData.targetPosition = 1000;
+		  return;
+	  }
+	  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 1);
+	  HAL_GPIO_TogglePin(DIO3_GPIO_Port, DIO3_Pin);
+	  if(HAL_GPIO_ReadPin(ZERO_GPIO_Port, ZERO_Pin) == 1 || zeroInc >= 2500){
+		  valveData.targetPosition = 0;
+		  valveData.positionInSteps = 0;
+		  isZeroing = 0;
+		  return;
+	  }
+	  zeroInc++;
+  }
   if(valveData.targetPosition != valveData.positionInSteps){
 	  if(valveData.targetPosition < valveData.positionInSteps){
 		  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 1);
