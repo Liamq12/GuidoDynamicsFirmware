@@ -23,7 +23,9 @@
 
 int pulseDiff;
 float pulsesToGo;
+
 int isZeroing;
+int isZeroingInit;
 
 extern struct valveData valveData;
 extern struct PID_Data PID_Data;
