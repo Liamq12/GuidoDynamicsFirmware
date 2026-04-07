@@ -23955,34 +23955,33 @@ LOAD C:/ST/STM32CubeIDE_1.18.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .text.BME680_ReadHumidity
                 0x080018a0      0x164 ./Core/Src/BME680.o
                 0x080018a0                BME680_ReadHumidity
- .text.main     0x08001a04      0x2d8 ./Core/Src/main.o
+ .text.main     0x08001a04      0x2dc ./Core/Src/main.o
                 0x08001a04                main
  .text.SystemClock_Config
-                0x08001cdc       0xd4 ./Core/Src/main.o
-                0x08001cdc                SystemClock_Config
+                0x08001ce0       0xd4 ./Core/Src/main.o
+                0x08001ce0                SystemClock_Config
  .text.MX_ADC1_Init
-                0x08001db0       0xa4 ./Core/Src/main.o
+                0x08001db4       0xa4 ./Core/Src/main.o
  .text.MX_I2C1_Init
-                0x08001e54       0x5c ./Core/Src/main.o
+                0x08001e58       0x5c ./Core/Src/main.o
  .text.MX_I2C3_Init
-                0x08001eb0       0x5c ./Core/Src/main.o
+                0x08001eb4       0x5c ./Core/Src/main.o
  .text.MX_TIM1_Init
-                0x08001f0c       0xa4 ./Core/Src/main.o
+                0x08001f10       0xa4 ./Core/Src/main.o
  .text.MX_TIM3_Init
-                0x08001fb0       0x9c ./Core/Src/main.o
+                0x08001fb4       0x9c ./Core/Src/main.o
  .text.MX_TIM4_Init
-                0x0800204c       0x98 ./Core/Src/main.o
+                0x08002050       0x98 ./Core/Src/main.o
  .text.MX_TIM7_Init
-                0x080020e4       0x6c ./Core/Src/main.o
+                0x080020e8       0x6c ./Core/Src/main.o
  .text.MX_TIM8_Init
-                0x08002150      0x11c ./Core/Src/main.o
+                0x08002154      0x11c ./Core/Src/main.o
  .text.MX_TIM13_Init
-                0x0800226c       0x48 ./Core/Src/main.o
+                0x08002270       0x48 ./Core/Src/main.o
  .text.MX_DMA_Init
-                0x080022b4       0x40 ./Core/Src/main.o
+                0x080022b8       0x40 ./Core/Src/main.o
  .text.MX_GPIO_Init
-                0x080022f4      0x150 ./Core/Src/main.o
- *fill*         0x08002444        0x4 
+                0x080022f8      0x150 ./Core/Src/main.o
  .text.HAL_TIM_IC_CaptureCallback
                 0x08002448      0x14c ./Core/Src/main.o
                 0x08002448                HAL_TIM_IC_CaptureCallback

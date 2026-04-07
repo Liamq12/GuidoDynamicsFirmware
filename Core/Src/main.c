@@ -167,7 +167,7 @@ int main(void)
   PID_Data.RPM_Target = 800;
   PID_Data.KP = 0.003f;
   PID_Data.KI = 0.01f;
-  PID_Data.KD = 0.5f;
+  PID_Data.KD = 0.15f; // 0.5
   PID_Data.accum = 0.0f;
   PID_Data.accumMax = 1.0f;
 
