@@ -304,6 +304,7 @@ void TIM4_IRQHandler(void)
 		  valveData.targetPosition = 0;
 		  valveData.positionInSteps = 0;
 		  isZeroing = 0;
+		  zeroInc = 0;
 		  return;
 	  }
 	  zeroInc++;

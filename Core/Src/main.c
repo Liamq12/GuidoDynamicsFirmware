@@ -103,8 +103,6 @@ extern struct dataPacket dataPacketPrev;
 extern int environmentalFlag;
 
 extern int rings;
-extern int isZeroing;
-extern int isZeroingInit;
 /* USER CODE END 0 */
 
 /**
@@ -169,7 +167,7 @@ int main(void)
   PID_Data.RPM_Target = 800;
   PID_Data.KP = 0.003f;
   PID_Data.KI = 0.01f;
-  PID_Data.KD = 0.15f; // 0.5
+  PID_Data.KD = 0.5f; // 0.5
   PID_Data.accum = 0.0f;
   PID_Data.accumMax = 1.0f;
 
@@ -178,14 +176,11 @@ int main(void)
   HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
   HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
 
-  HAL_Delay(1000);
+//  HAL_Delay(1000);
 
   rings = 2;
 
   BME680_Init();
-
-  isZeroing = 1;
-  isZeroingInit = 1;
 
 //  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
@@ -222,7 +217,7 @@ int main(void)
 				  ringsDebounce = 1;
 			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
-			  if(PID_Data.RPM_Target >= PID_Data.RPM_End_Target){
+			  if(dataPacketNow.RPM >= PID_Data.RPM_End_Target-1){
 				  rings = 4;
 				  PID_Data.KI = KI_Storage;
 				  KI_Storage = 0;

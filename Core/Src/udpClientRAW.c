@@ -10,6 +10,7 @@
 #include <main.h>
 
 #include "udpClientRAW.h"
+#include "stm32f4xx_it.h"
 
 #define CLAMP(x, min, max)  ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
 
@@ -46,6 +47,9 @@ ip_addr_t DestIPaddr;
 ip_addr_t myIPaddr;
 
 static char data[16384];
+
+extern int isZeroing;
+extern int isZeroingInit;
 
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
@@ -142,8 +146,8 @@ void udpClient_send(void)
       len += snprintf(data + len, sizeof(data) - len, "[\"rSpd\",%.2f],",    dataArray[i].RPM);
       len += snprintf(data + len, sizeof(data) - len, "[\"dyLd\",%f],",      dataArray[i].force);
       len += snprintf(data + len, sizeof(data) - len, "[\"RPMT\",%.2f],",     PIDArray[i].RPM_Target);
-      len += snprintf(data + len, sizeof(data) - len, "[\"vPos\",%.2f],",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
-      len += snprintf(data + len, sizeof(data) - len, "[\"acel\",%.2f]",        dataArray[i].acceleration);
+      len += snprintf(data + len, sizeof(data) - len, "[\"vPos\",%.2f]",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
+//      len += snprintf(data + len, sizeof(data) - len, "[\"acel\",%.2f]",        dataArray[i].acceleration);
 //      len += snprintf(data + len, sizeof(data) - len, "[\"debug\",\"Test\",%d]", dataBatchingIndex);
 
       if(i < dataBatchingMax - 1){
@@ -208,7 +212,8 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
         	int stepPosition = (num/100)*valveData.pulsesPerRev;
 			valveData.targetPosition = stepPosition;
         }else if(strcmp(subCWBuffer, "ZER") == 0){
-
+		    isZeroing = 1;
+		    isZeroingInit = 1;
         }else if(strcmp(subCWBuffer, "PPR") == 0){
         	valveData.pulsesPerRev = num;
         }else if(strcmp(subCWBuffer, "GRO") == 0){
