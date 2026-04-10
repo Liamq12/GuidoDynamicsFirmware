@@ -18,6 +18,7 @@
 #define ADS1115_CFG_OS_START    0x8000  // Start single conversion
 #define ADS1115_CFG_MUX_AIN0    0x4000  // AINp = AIN0, AINn = GND
 #define ADS1115_CFG_PGA_4_096V  0x0200  // ±4.096V range
+//#define ADS1115_CFG_PGA_4_096V  0x0000  // ±4.096V range
 #define ADS1115_CFG_MODE_SINGLE 0x0100  // Single-shot mode
 #define ADS1115_CFG_DR_128SPS   0x0080  // 128 samples per second
 #define ADS1115_CFG_COMP_QUE_DIS 0x0003 // Disable comparator

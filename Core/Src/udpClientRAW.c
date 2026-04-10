@@ -51,6 +51,8 @@ static char data[16384];
 extern int isZeroing;
 extern int isZeroingInit;
 
+extern int rings;
+
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
 //	udpClient_send();
@@ -222,6 +224,8 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     }else if(strcmp(CWBuffer, "COPID") == 0){
     	if(strcmp(subCWBuffer, "RPM") == 0){
     		PID_Data.RPM_Target = (float) num;
+    	}else if(strcmp(subCWBuffer, "ACU") == 0){
+    		PID_Data.accum = (float) num;
     	}
     }else if(strcmp(CWBuffer, "ENPID") == 0){
     	if(strcmp(subCWBuffer, "RPM") == 0){
@@ -242,6 +246,10 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     		PID_Data.KI = (float) num;
     	}else if(strcmp(subCWBuffer, "KDT") == 0){
     		PID_Data.KD = (float) num;
+    	}
+    }else if(strcmp(CWBuffer, "BELLR") == 0){
+    	if(strcmp(subCWBuffer, "RNG") == 0){
+    		rings = (int) num;
     	}
     }
     // Free the receive pbuf

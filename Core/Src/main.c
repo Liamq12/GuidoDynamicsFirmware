@@ -211,16 +211,16 @@ int main(void)
 
 		  if(PID_Data.RPM_RAMP_EN == 1){
 			  if(ringsDebounce == 0){
-				  KI_Storage = PID_Data.KI;
-				  PID_Data.KI = 0;
+				  // KI_Storage = PID_Data.KI;
+				  // PID_Data.KI = 0;
 				  rings = 1;
 				  ringsDebounce = 1;
 			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
 			  if(dataPacketNow.RPM >= PID_Data.RPM_End_Target-1){
 				  rings = 4;
-				  PID_Data.KI = KI_Storage;
-				  KI_Storage = 0;
+				  // PID_Data.KI = KI_Storage;
+				  // KI_Storage = 0;
 				  PID_Data.RPM_RAMP_EN = 0;
 				  ringsDebounce = 0;
 			  }
