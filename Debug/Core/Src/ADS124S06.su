@@ -1,0 +1,7 @@
+../Core/Src/ADS124S06.c:31:6:ADS124S06_WriteRegister	32	static
+../Core/Src/ADS124S06.c:45:9:ADS124S06_ReadRegister	32	static
+../Core/Src/ADS124S06.c:62:6:ADS124S06_TestPGA	24	static
+../Core/Src/ADS124S06.c:85:6:ADS124S06_ReadID	24	static
+../Core/Src/ADS124S06.c:107:6:ADS124S06_Init	16	static
+../Core/Src/ADS124S06.c:147:9:ADS124S06_ReadData	24	static
+../Core/Src/ADS124S06.c:172:7:ADS124S06_ConvertToVoltage	16	static

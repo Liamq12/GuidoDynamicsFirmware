@@ -26,6 +26,7 @@
 #include "ADS1115.h"
 #include "BME680.h"
 #include "valveControl.h"
+#include "ADS124S06.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,8 @@ DMA_HandleTypeDef hdma_adc1;
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c3;
 
+SPI_HandleTypeDef hspi1;
+
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
@@ -70,6 +73,8 @@ uint32_t timerPrev = 0;
 uint16_t adc_buf[16];
 
 int ringsDebounce = 0;
+
+int visAlarm = 0;
 
 float KI_Storage = 0.0f;
 
@@ -90,6 +95,7 @@ static void MX_TIM4_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM13_Init(void);
 static void MX_TIM7_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -145,6 +151,7 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM13_Init();
   MX_TIM7_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_Base_Start_IT(&htim3);
@@ -185,6 +192,8 @@ int main(void)
 //  HAL_GPIO_WritePin(DIO2_GPIO_Port, DIO2_Pin, 0);
 
 //  HAL_NVIC_DisableIRQ(TIM4_IRQn);
+
+  ADS124S06_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -194,6 +203,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if(visAlarm == 1){
+		  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 1);
+	  }
+
+	  if(visAlarm == 1 && dataPacketNow.RPM <= 0.6 * PID_Data.RPM_End_Target){
+		  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
+		  visAlarm = 0;
+	  }
+
 	  if(valveData.intFlag == 1){
 		  valveControlLoop();
 	  }
@@ -211,16 +229,17 @@ int main(void)
 
 		  if(PID_Data.RPM_RAMP_EN == 1){
 			  if(ringsDebounce == 0){
-				  // KI_Storage = PID_Data.KI;
-				  // PID_Data.KI = 0;
+				   KI_Storage = PID_Data.KI;
+				   PID_Data.KI = 0;
 				  rings = 1;
 				  ringsDebounce = 1;
 			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
 			  if(dataPacketNow.RPM >= PID_Data.RPM_End_Target-1){
 				  rings = 4;
-				  // PID_Data.KI = KI_Storage;
-				  // KI_Storage = 0;
+				  visAlarm = 1;
+				  PID_Data.KI = KI_Storage;
+				  KI_Storage = 0;
 				  PID_Data.RPM_RAMP_EN = 0;
 				  ringsDebounce = 0;
 			  }
@@ -233,8 +252,8 @@ int main(void)
 //		  }
 //      }
 
-      int16_t rawValue = ADS1115_ReadChannel(0);
-      float voltage = ADS1115_ConvertToVoltage(rawValue);
+	  int32_t test = ADS124S06_ReadData();
+	  float voltage = ADS124S06_ConvertToVoltage(test, 1.66f);
 
       if(environmentalFlag == 1){
     	  BME680_ForceTrigger();
@@ -419,6 +438,44 @@ static void MX_I2C3_Init(void)
   /* USER CODE BEGIN I2C3_Init 2 */
 
   /* USER CODE END I2C3_Init 2 */
+
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
 
 }
 
@@ -766,6 +823,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(DIO2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : DRDY_Pin */
+  GPIO_InitStruct.Pin = DRDY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(DRDY_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
