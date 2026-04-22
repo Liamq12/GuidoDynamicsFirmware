@@ -146,7 +146,7 @@ void udpClient_send(void)
   for(int i = 0; i < dataBatchingMax; i++){
       len += snprintf(data + len, sizeof(data) - len, "\"data%d\":[", i);
       len += snprintf(data + len, sizeof(data) - len, "[\"rSpd\",%.2f],",    dataArray[i].RPM);
-      len += snprintf(data + len, sizeof(data) - len, "[\"dyLd\",%f],",      dataArray[i].force);
+      len += snprintf(data + len, sizeof(data) - len, "[\"dyLd\",%.6f],",      dataArray[i].force);
       len += snprintf(data + len, sizeof(data) - len, "[\"RPMT\",%.2f],",     PIDArray[i].RPM_Target);
       len += snprintf(data + len, sizeof(data) - len, "[\"vPos\",%.2f]",   (valveArray[i].positionInSteps / valveArray[i].pulsesPerRev) * 100.0f);
 //      len += snprintf(data + len, sizeof(data) - len, "[\"acel\",%.2f]",        dataArray[i].acceleration);

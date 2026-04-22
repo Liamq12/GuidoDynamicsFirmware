@@ -69,6 +69,8 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOE
 #define DIO2_Pin GPIO_PIN_12
 #define DIO2_GPIO_Port GPIOD
+#define DRDY_Pin GPIO_PIN_6
+#define DRDY_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 struct valveData {
