@@ -76,6 +76,10 @@ int ringsDebounce = 0;
 
 int visAlarm = 0;
 
+int pumpActive = 0;
+
+float valveIdleThresh = 15.0f;
+
 float KI_Storage = 0.0f;
 
 struct valveData valveData;
@@ -204,11 +208,12 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  if(visAlarm == 1){
-		  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 1);
+//		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL1_Pin, 1);
 	  }
 
 	  if(visAlarm == 1 && dataPacketNow.RPM <= 0.6 * PID_Data.RPM_End_Target){
-		  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
+//		  HAL_GPIO_WritePin(AL1_GPIO_Port, AL1_Pin, 0);
+//		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
 		  visAlarm = 0;
 	  }
 
