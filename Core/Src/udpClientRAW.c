@@ -42,6 +42,7 @@ struct valveData valveArray[10];
 struct PID_Data PIDArray[10];
 
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim9;
 
 ip_addr_t DestIPaddr;
 ip_addr_t myIPaddr;
@@ -52,6 +53,8 @@ extern int isZeroing;
 extern int isZeroingInit;
 
 extern int rings;
+
+extern int pumpActive;
 
 //void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 //{
@@ -230,6 +233,8 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
     }else if(strcmp(CWBuffer, "ENPID") == 0){
     	if(strcmp(subCWBuffer, "RPM") == 0){
     		PID_Data.RPM_EN = (int) num;
+    		__HAL_TIM_SET_COUNTER(&htim9, 0);  // reset to 0
+    		pumpActive = 1;
     	}
     }else if(strcmp(CWBuffer, "FRAMP") == 0){
     	if(strcmp(subCWBuffer, "RPM") == 0){
