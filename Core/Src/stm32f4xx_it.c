@@ -64,6 +64,7 @@ int ringGroupsCount = 0;
 int ohFuckOhShit = 0; // High to override bell algorithm and ring the bell until power cycled
 
 int environmentalFlag = 0; // High takes measurement of BME680
+int enviromentFlagDebounce = 0;
 
 extern int dataBatchingMax; // Should be a define/constant, or query length of
 extern int dataBatchingIndex;
@@ -250,7 +251,12 @@ void TIM1_UP_TIM10_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
   udpClient_send();
-  environmentalFlag = 1;
+  if(enviromentFlagDebounce >= 3){
+	  environmentalFlag = 1;
+	  enviromentFlagDebounce = 0;
+  }else{
+	  enviromentFlagDebounce++;
+  }
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
 
@@ -364,34 +370,46 @@ void TIM8_UP_TIM13_IRQHandler(void)
   }
 
   if(ohFuckOhShit == 0){
-	  if(rings > 0 && ringStatus == 0){
-		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1); // Ring the bell
-		  ringGroupsCount++;
-		  ringStatus = 1; // This should really be a register read of the output register
-	  }else if(rings > 0 && ringStatus == 1 && ringPSC < 10){
-		  ringPSC++;
-	  }else if(rings > 0 && ringStatus == 1 && ringPSC >= 10){
-		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0); // Stop the bell
-		  ringPSCG = 0;
-		  ringStatus = 2;
-		  ringPSC = 0;
-		  rings--;
-	  }else if(ringStatus == 2 && ringPSC < 10){
-		  if(ringGroupsCount % 2 == 0){
-			  if(ringPSCG < 20){
-				  ringPSCG++;
-			  }else{
-				  ringPSC++;
-			  }
+	  if(rings > 0){
+		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1);
+		  if(ringPSC > 40){
+			  ringPSC = 0;
+			  rings--;
+			  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
 		  }else{
 			  ringPSC++;
 		  }
-	  }else if(ringStatus == 2 && ringPSC >= 10){
-		  ringStatus = 0;
-		  ringPSC = 0;
-	  }else if(rings == 0){
-		  ringGroupsCount = 0;
+	  }else{
+		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0);
 	  }
+//	  if(rings > 0 && ringStatus == 0){
+//		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1); // Ring the bell
+//		  ringGroupsCount++;
+//		  ringStatus = 1; // This should really be a register read of the output register
+//	  }else if(rings > 0 && ringStatus == 1 && ringPSC < 10){
+//		  ringPSC++;
+//	  }else if(rings > 0 && ringStatus == 1 && ringPSC >= 10){
+//		  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 0); // Stop the bell
+//		  ringPSCG = 0;
+//		  ringStatus = 2;
+//		  ringPSC = 0;
+//		  rings--;
+//	  }else if(ringStatus == 2 && ringPSC < 10){
+//		  if(ringGroupsCount % 2 == 0){
+//			  if(ringPSCG < 20){
+//				  ringPSCG++;
+//			  }else{
+//				  ringPSC++;
+//			  }
+//		  }else{
+//			  ringPSC++;
+//		  }
+//	  }else if(ringStatus == 2 && ringPSC >= 10){
+//		  ringStatus = 0;
+//		  ringPSC = 0;
+//	  }else if(rings == 0){
+//		  ringGroupsCount = 0;
+//	  }
   }else{
 	  HAL_GPIO_WritePin(AL2_GPIO_Port, AL2_Pin, 1);
   }

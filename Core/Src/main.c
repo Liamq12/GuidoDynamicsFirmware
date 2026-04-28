@@ -79,7 +79,7 @@ int visAlarm = 0;
 
 int pumpActive = 0;
 int startCount = 0;
-float valveIdleThresh = 15.0f;
+float valveIdleThresh = 400.0f;
 
 float KI_Storage = 0.0f;
 
@@ -231,12 +231,13 @@ int main(void)
 
 	  if(valveData.position <= valveIdleThresh){
 		  uint32_t cnt = __HAL_TIM_GET_COUNTER(&htim9);
-		  if(cnt >= 20000){
+		  if(cnt >= 30000){
 			  pumpActive = 0;
 //			  startCount = 0;
 		  }
 	  }else if(valveData.position >= valveIdleThresh){
 		  __HAL_TIM_SET_COUNTER(&htim9, 0);  // reset to 0
+		  pumpActive = 1;
 	  }
 
 	  if(pumpActive == 1){
@@ -260,9 +261,9 @@ int main(void)
 				  ringsDebounce = 1;
 			  }
 			  PID_Data.RPM_Target += (PID_Data.RPM_Ramp_Rate/RAMP_TIMER_FREQUENCY);
-			  if(dataPacketNow.RPM >= PID_Data.RPM_End_Target-1){
-				  rings = 4;
-				  visAlarm = 1;
+			  if(PID_Data.RPM_Target >= PID_Data.RPM_End_Target-1){
+				  rings = 6;
+				  //visAlarm = 1;
 				  PID_Data.KI = KI_Storage;
 				  KI_Storage = 0;
 				  PID_Data.RPM_RAMP_EN = 0;
